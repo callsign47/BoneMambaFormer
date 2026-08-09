@@ -20,6 +20,8 @@ if PROJECT_ROOT not in sys.path:
 
 from src.models.cnn import BoneCancerCNN
 from src.models.swin import BoneCancerSwin
+from src.models.mamba import BoneCancerMamba
+from src.models.attention_fusion import BoneCancerAttentionFusion
 
 def export_pth_to_h5(pth_path, h5_path, model_type='cnn'):
     print(f"Loading PyTorch checkpoint from: {pth_path}")
@@ -30,7 +32,18 @@ def export_pth_to_h5(pth_path, h5_path, model_type='cnn'):
     val_acc = checkpoint.get("val_acc", None)
     val_loss = checkpoint.get("val_loss", None)
 
-    arch_desc = "BoneCancerCNN (ResNet18 backbone + 256D projection + 2-class head)" if model_type == 'cnn' else "BoneCancerSwin (Swin-Tiny backbone + 256D projection + 2-class head)"
+    if model_type == 'cnn':
+        arch_desc = "BoneCancerCNN (ResNet18 backbone + 256D projection + 2-class head)"
+    elif model_type == 'swin':
+        arch_desc = "BoneCancerSwin (Swin-Tiny backbone + 256D projection + 2-class head)"
+    elif model_type == 'mamba':
+        arch_desc = "BoneCancerMamba (Selective SSM Mamba backbone + 256D projection + 2-class head)"
+    elif model_type == 'attention_fusion':
+        arch_desc = "BoneCancerAttentionFusion (Frozen CNN/Swin/Mamba + Adaptive Softmax Attention + 2-class head)"
+    elif model_type == 'hybrid':
+        arch_desc = "BoneCancerHybridModel (Joint End-to-End CNN + Swin-Tiny + Mamba + Softmax Branch Attention)"
+    else:
+        arch_desc = f"BoneCancerModel ({model_type})"
 
     print(f"Exporting state_dict ({len(state_dict)} tensor keys) to HDF5 container: {h5_path}")
     
@@ -107,6 +120,10 @@ def verify_h5_export(h5_path, pth_path, model_type='cnn'):
             model = BoneCancerCNN(pretrained=False, feature_dim=256, num_classes=2)
         elif model_type == 'swin':
             model = BoneCancerSwin(pretrained=False, feature_dim=256, num_classes=2)
+        elif model_type == 'mamba':
+            model = BoneCancerMamba(feature_dim=256, num_classes=2)
+        elif model_type in ['attention_fusion', 'hybrid']:
+            model = BoneCancerAttentionFusion(feature_dim=256, num_classes=2, freeze_backbones=False)
         else:
             raise ValueError(f"Unknown model_type: {model_type}")
 
