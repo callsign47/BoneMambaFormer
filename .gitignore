@@ -1,0 +1,58 @@
+# Python & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Datasets (Large binary files)
+DATASET/
+data/raw/
+data/processed/
+*.zip
+*.tar
+*.gz
+*.7z
+
+# Model Checkpoints & Weights
+checkpoints/
+*.pt
+*.pth
+*.bin
+*.onnx
+*.safetensors
+*.h5
+*.ckpt
+
+# Output, Logs & Experiments
+logs/
+wandb/
+runs/
+results/
+reports/*.pdf
+reports/*.docx
+
+# IDE & OS Specific
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
