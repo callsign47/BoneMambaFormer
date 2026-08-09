@@ -1,0 +1,176 @@
+{
+  "device": "cuda",
+  "cuda_available": true,
+  "splits_tested": {
+    "original": {
+      "train": {
+        "total_batches": 441,
+        "total_samples": 7056,
+        "batch_image_shape": [
+          16,
+          3,
+          224,
+          224
+        ],
+        "batch_label_shape": [
+          16
+        ],
+        "unique_labels": [
+          0,
+          1
+        ],
+        "valid_labels_check": true,
+        "stats": {
+          "min": -2.1179039478302,
+          "max": 2.640000104904175,
+          "mean": -0.3321782350540161,
+          "std": 1.5711268186569214
+        },
+        "nan_check_passed": true,
+        "inf_check_passed": true,
+        "gpu_transfer_passed": true,
+        "gpu_device": "cuda:0"
+      },
+      "val": {
+        "total_batches": 56,
+        "total_samples": 882,
+        "batch_image_shape": [
+          16,
+          3,
+          224,
+          224
+        ],
+        "batch_label_shape": [
+          16
+        ],
+        "unique_labels": [
+          0
+        ],
+        "valid_labels_check": true,
+        "stats": {
+          "min": -2.1179039478302,
+          "max": 2.640000104904175,
+          "mean": -0.6306880116462708,
+          "std": 1.3016055822372437
+        },
+        "nan_check_passed": true,
+        "inf_check_passed": true,
+        "gpu_transfer_passed": true,
+        "gpu_device": "cuda:0"
+      },
+      "test": {
+        "total_batches": 55,
+        "total_samples": 872,
+        "batch_image_shape": [
+          16,
+          3,
+          224,
+          224
+        ],
+        "batch_label_shape": [
+          16
+        ],
+        "unique_labels": [
+          0
+        ],
+        "valid_labels_check": true,
+        "stats": {
+          "min": -2.1179039478302,
+          "max": 2.640000104904175,
+          "mean": -0.5022157430648804,
+          "std": 1.3744752407073975
+        },
+        "nan_check_passed": true,
+        "inf_check_passed": true,
+        "gpu_transfer_passed": true,
+        "gpu_device": "cuda:0"
+      }
+    },
+    "derived_clean": {
+      "train": {
+        "total_batches": 464,
+        "total_samples": 7417,
+        "batch_image_shape": [
+          16,
+          3,
+          224,
+          224
+        ],
+        "batch_label_shape": [
+          16
+        ],
+        "unique_labels": [
+          0,
+          1
+        ],
+        "valid_labels_check": true,
+        "stats": {
+          "min": -2.1179039478302,
+          "max": 2.640000104904175,
+          "mean": -0.19810780882835388,
+          "std": 1.470253348350525
+        },
+        "nan_check_passed": true,
+        "inf_check_passed": true,
+        "gpu_transfer_passed": true,
+        "gpu_device": "cuda:0"
+      },
+      "val": {
+        "total_batches": 44,
+        "total_samples": 698,
+        "batch_image_shape": [
+          16,
+          3,
+          224,
+          224
+        ],
+        "batch_label_shape": [
+          16
+        ],
+        "unique_labels": [
+          0,
+          1
+        ],
+        "valid_labels_check": true,
+        "stats": {
+          "min": -2.1179039478302,
+          "max": 2.640000104904175,
+          "mean": -0.4447433650493622,
+          "std": 1.5006815195083618
+        },
+        "nan_check_passed": true,
+        "inf_check_passed": true,
+        "gpu_transfer_passed": true,
+        "gpu_device": "cuda:0"
+      },
+      "test": {
+        "total_batches": 44,
+        "total_samples": 695,
+        "batch_image_shape": [
+          16,
+          3,
+          224,
+          224
+        ],
+        "batch_label_shape": [
+          16
+        ],
+        "unique_labels": [
+          0,
+          1
+        ],
+        "valid_labels_check": true,
+        "stats": {
+          "min": -2.1179039478302,
+          "max": 2.640000104904175,
+          "mean": -0.4245353639125824,
+          "std": 1.404584527015686
+        },
+        "nan_check_passed": true,
+        "inf_check_passed": true,
+        "gpu_transfer_passed": true,
+        "gpu_device": "cuda:0"
+      }
+    }
+  }
+}
