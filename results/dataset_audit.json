@@ -1,0 +1,38 @@
+{
+  "total_images": 8810,
+  "splits": {
+    "train": {
+      "total": 7056,
+      "cancer": 3081,
+      "normal": 3975
+    },
+    "val": {
+      "total": 882,
+      "cancer": 398,
+      "normal": 484
+    },
+    "test": {
+      "total": 872,
+      "cancer": 384,
+      "normal": 488
+    }
+  },
+  "overall_class_counts": {
+    "cancer": 3863,
+    "normal": 4947
+  },
+  "dimensions": {
+    "640x640": 8810
+  },
+  "color_modes": {
+    "RGB": 8810
+  },
+  "formats": {
+    "JPEG": 8810
+  },
+  "corrupted_files": [],
+  "hash_duplicates": {},
+  "duplicate_hash_count": 0,
+  "hash_duplicates_count": 1059,
+  "total_duplicate_files": 1059
+}
