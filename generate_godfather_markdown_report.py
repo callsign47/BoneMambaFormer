@@ -1,4 +1,9 @@
-# FINAL MASTER TECHNICAL REPORT: BONE CANCER CLASSIFICATION PROJECT (ICIMCPS-2026)
+import os
+
+def generate_report():
+    report_path = os.path.join(r"c:\Users\admin_fix\Downloads\BONE CANCER ICIMCPS", "reports", "FINAL_MASTER_TECHNICAL_REPORT.md")
+    
+    content = """# FINAL MASTER TECHNICAL REPORT: BONE CANCER CLASSIFICATION PROJECT (ICIMCPS-2026)
 
 **Project Title:** BoneMambaFormer: Adaptive Softmax Attention Fusion of CNN, Swin-Tiny, and Mamba Backbones for Leakage-Clean Bone Cancer Classification  
 **Target Conference:** International Conference on Intelligent Medical Computer Processing Systems (ICIMCPS-2026)  
@@ -18,7 +23,7 @@
 ===================================================================================
 Project Name             : BoneMambaFormer (ICIMCPS-2026 Master Project)
 Target Conference        : ICIMCPS-2026
-Repository Path          : c:\Users\admin_fix\Downloads\BONE CANCER ICIMCPS
+Repository Path          : c:\\Users\\admin_fix\\Downloads\\BONE CANCER ICIMCPS
 Evaluation Protocol      : derived_clean (Leakage-Clean Untouched Test Set, n=695)
 Primary Architecture     : Joint End-to-End Hybrid (CNN + Swin-Tiny + Mamba + Attention)
 Total Hybrid Parameters  : 39,737,093 Trainable Parameters (~40 Million)
@@ -50,7 +55,7 @@ These backbones are integrated via a dynamic **Adaptive Softmax Branch Attention
    - **End-to-End Hybrid (Joint Optimization):** **98.42% Test Accuracy**, 0.9840 Macro F1, 0.9990 ROC-AUC, 0.9680 Kappa, 88.65 min training time, 35.19 ms/sample latency (**39,737,093 trainable parameters ~40M**).
 3. **Controlled Ablation Findings:**
    - Removing the Swin-Tiny branch (`w/o Swin`) causes a catastrophic performance collapse from **98.42% to 69.35%** (a 29.07% drop), proving Swin-Tiny is the primary visual backbone.
-   - Equal branch weighting ($\\alpha=[1/3, 1/3, 1/3]$), removing CNN (`w/o CNN`), and removing Mamba (`w/o Mamba`) all achieve 98.71% test accuracy under inference-time branch masking. Diagnostic probability audits confirm maximum output probability shifts of up to **31.54%** across these configurations, verifying authentic experimental independence.
+   - Equal branch weighting ($\\\\alpha=[1/3, 1/3, 1/3]$), removing CNN (`w/o CNN`), and removing Mamba (`w/o Mamba`) all achieve 98.71% test accuracy under inference-time branch masking. Diagnostic probability audits confirm maximum output probability shifts of up to **31.54%** across these configurations, verifying authentic experimental independence.
 4. **Learned Attention Dynamics:** In the joint End-to-End Hybrid model, the Softmax attention mechanism assigned a mean weight of **92.61% to Swin-Tiny**, **6.25% to Mamba**, and **1.14% to CNN**. For Cancer detection specifically, Mamba's contribution expands to **10.39%**, demonstrating class-dependent representation recruitment.
 5. **Overfitting & Generalization:** All five models demonstrated high cross-split stability with sub-0.5% generalization gaps between validation and test accuracy (CNN: 0.44%, Swin: 0.44%, Mamba: +0.37%, Fusion: 0.00%, Hybrid: 0.29%). No substantial evidence of severe overfitting was observed under `derived_clean`.
 
@@ -208,7 +213,7 @@ The core objectives of the ICIMCPS-2026 Bone Cancer Classification project are s
    - Standalone Swin Transformer (Swin-Tiny)
    - Standalone Selective State Space Model (Mamba / SSM)
 3. **Adaptive Attention Fusion Integration:** Design and implement a dynamic Softmax Branch Attention module that learns sample-adaptive scalar contribution weights over projected 256-D feature vectors from each backbone. Evaluate this mechanism under both frozen backbone features (Phase 6) and joint end-to-end optimization (Phase 7).
-4. **Controlled Ablation & Diagnostic Verification:** Conduct systematic inference-time branch masking ($w/o\ Swin$, $w/o\ Mamba$, $w/o\ CNN$) and fixed-weight ($\\alpha=[1/3, 1/3, 1/3]$) ablation experiments. Execute probability-distribution diagnostic audits to verify that observed metric variations represent authentic experimental property shifts rather than pipeline artifacts.
+4. **Controlled Ablation & Diagnostic Verification:** Conduct systematic inference-time branch masking ($w/o\\ Swin$, $w/o\\ Mamba$, $w/o\\ CNN$) and fixed-weight ($\\\\alpha=[1/3, 1/3, 1/3]$) ablation experiments. Execute probability-distribution diagnostic audits to verify that observed metric variations represent authentic experimental property shifts rather than pipeline artifacts.
 5. **Definitive Scientific Documentation:** Generate a completely reproducible, non-fabricated, publication-ready technical dossier, evidence package, and verified artifact map adhering strictly to locked experimental findings.
 
 ---
@@ -232,7 +237,7 @@ TOTAL RAW IMAGES     3,863               4,947                8,810
 ```
 
 ### Physical Image Characteristics:
-- **Spatial Resolution:** Variable raw resolutions ranging from $512 \times 512$ to $2048 \times 2048$ pixels.
+- **Spatial Resolution:** Variable raw resolutions ranging from $512 \\times 512$ to $2048 \\times 2048$ pixels.
 - **Color Format:** RGB (3 channels) converted from standard grayscale X-ray DICOM exports.
 - **Visual Features:** Radiographs display human skeletal anatomy (femur, tibia, humerus, pelvis, and knee joints) exhibiting focal cortical erosion, periosteal reaction, osteolytic lesions, or healthy bone trabeculation.
 
@@ -304,11 +309,11 @@ TOTAL CLEAN IMAGES   3,863               4,947                8,810
 
 All input images undergo a deterministic, standardized preprocessing pipeline in `src/preprocessing.py` prior to model ingestion:
 
-1. **Resolution Standardisation:** Images are resized from raw dimensions to a uniform spatial resolution of $224 \times 224$ pixels using bi-cubic interpolation.
+1. **Resolution Standardisation:** Images are resized from raw dimensions to a uniform spatial resolution of $224 \\times 224$ pixels using bi-cubic interpolation.
 2. **Contrast Enhancement:** Contrast Limited Adaptive Histogram Equalization (CLAHE) is applied with a clip limit of $2.0$ and a tile grid size of $(8, 8)$ to accentuate subtle bone trabecular lines and periosteal boundaries without amplifying high-frequency background noise.
 3. **RGB Channel Normalization:** Pixel intensity values in $[0, 255]$ are scaled to $[0.0, 1.0]$ and normalized using standard ImageNet channel-wise mean and standard deviation:
-   $$\\mu = [0.485, 0.456, 0.406], \\quad \\sigma = [0.229, 0.224, 0.225]$$
-   $$x_{norm} = \\frac{x - \\mu}{\\sigma}$$
+   $$\\\\mu = [0.485, 0.456, 0.406], \\\\quad \\\\sigma = [0.229, 0.224, 0.225]$$
+   $$x_{norm} = \\\\frac{x - \\\\mu}{\\\\sigma}$$
 
 ---
 
@@ -317,9 +322,9 @@ All input images undergo a deterministic, standardized preprocessing pipeline in
 To prevent overfitting and force feature representations to remain invariant to orientation, zoom, and local distortion, an automated stochastic augmentation suite is applied exclusively during training (`src/augmentation.py`):
 
 - **Random Horizontal & Vertical Flips:** Applied with $p=0.5$ probability.
-- **Random Affine Rotation:** Rotations bounded within $\\pm 15^\\circ$.
-- **Elastic Transformations:** Non-rigid spatial distortion ($\\alpha = 1.0, \\sigma = 50.0$) simulating minor positioning deformations.
-- **Color & Intensity Jitter:** Brightness and contrast adjustments bounded by $\\pm 0.1$.
+- **Random Affine Rotation:** Rotations bounded within $\\\\pm 15^\\\\circ$.
+- **Elastic Transformations:** Non-rigid spatial distortion ($\\\\alpha = 1.0, \\\\sigma = 50.0$) simulating minor positioning deformations.
+- **Color & Intensity Jitter:** Brightness and contrast adjustments bounded by $\\\\pm 0.1$.
 
 Validation and test pipelines remain 100% deterministic, executing only spatial resizing, CLAHE contrast enhancement, and ImageNet normalization.
 
@@ -352,11 +357,11 @@ Evaluation Protocol     : Zero test-set tuning; final evaluation on 695 untouche
 ```
 
 ### Learning Rate Strategy:
-- **Standalone Baselines (CNN, Swin, Mamba):** Standard initial learning rate of $\\eta = 1 \\times 10^{-4}$.
-- **Attention Fusion (Phase 6):** Backbones frozen; fusion head trained at $\\eta = 1 \\times 10^{-3}$.
+- **Standalone Baselines (CNN, Swin, Mamba):** Standard initial learning rate of $\\\\eta = 1 \\\\times 10^{-4}$.
+- **Attention Fusion (Phase 6):** Backbones frozen; fusion head trained at $\\\\eta = 1 \\\\times 10^{-3}$.
 - **Joint End-to-End Hybrid (Phase 7):** Differential learning rates:
-  - Pretrained Backbones (CNN, Swin, Mamba): $\\eta_{backbone} = 2 \\times 10^{-5}$
-  - Attention Fusion Head & Classifier: $\\eta_{head} = 1 \\times 10^{-4}$
+  - Pretrained Backbones (CNN, Swin, Mamba): $\\\\eta_{backbone} = 2 \\\\times 10^{-5}$
+  - Attention Fusion Head & Classifier: $\\\\eta_{head} = 1 \\\\times 10^{-4}$
 
 ---
 
@@ -391,7 +396,7 @@ The CNN branch utilizes a **ResNet-18** architecture pretrained on ImageNet. Its
 ### Final Performance Metrics (Untouched Test Set, n=695):
 - **Test Accuracy:** 97.27% (676 / 695 correct)
 - **Macro F1-Score:** 0.9724 | **Macro Precision:** 0.9722 | **Macro Recall:** 0.9725
-- **Cohen's Kappa ($\\kappa$):** 0.9448 | **MCC:** 0.9448
+- **Cohen's Kappa ($\\\\kappa$):** 0.9448 | **MCC:** 0.9448
 - **ROC-AUC:** 0.9977 | **PR-AUC:** 0.9972
 - **Training Time:** 28.64 minutes | **Inference Latency:** 29.38 ms/sample (34.0 FPS)
 - **Best Validation Epoch:** Epoch 7 (97.71% Val Acc)
@@ -422,7 +427,7 @@ The Swin Transformer branch utilizes **Swin-Tiny** (`swin_t`) pretrained on Imag
 ### Final Performance Metrics (Untouched Test Set, n=695):
 - **Test Accuracy:** 98.13% (682 / 695 correct)
 - **Macro F1-Score:** 0.9811 | **Macro Precision:** 0.9803 | **Macro Recall:** 0.9821
-- **Cohen's Kappa ($\\kappa$):** 0.9623 | **MCC:** 0.9625
+- **Cohen's Kappa ($\\\\kappa$):** 0.9623 | **MCC:** 0.9625
 - **ROC-AUC:** 0.9991 | **PR-AUC:** 0.9990
 - **Training Time:** 101.13 minutes | **Inference Latency:** 28.66 ms/sample (34.9 FPS)
 - **Best Validation Epoch:** Epoch 15 (98.57% Val Acc)
@@ -445,7 +450,7 @@ The Swin Transformer branch utilizes **Swin-Tiny** (`swin_t`) pretrained on Imag
 ## 20. MAMBA ARCHITECTURE AND RESULTS
 
 ### Purpose & Architectural Details:
-The Mamba branch is a standalone **Selective State Space Model (SSM)** (`BoneCancerMamba`) implemented in pure PyTorch. Images are divided into $16 \times 16$ patches ($196$ tokens), mapped via 1D positional embeddings, and passed through 2 stacked Selective SSM blocks with linear state transitions ($d_{model}=128, d_{state}=16, d_{conv}=4, expand=2$).
+The Mamba branch is a standalone **Selective State Space Model (SSM)** (`BoneCancerMamba`) implemented in pure PyTorch. Images are divided into $16 \\times 16$ patches ($196$ tokens), mapped via 1D positional embeddings, and passed through 2 stacked Selective SSM blocks with linear state transitions ($d_{model}=128, d_{state}=16, d_{conv}=4, expand=2$).
 - **Purpose:** Model long-range sequential patch dependencies in linear time $O(N)$ without attention matrix overhead.
 - **Backbone Output:** 128-dimensional hidden state vector.
 - **Projection Head:** Linear layer projecting 128D to 256D, followed by LayerNorm and GELU.
@@ -454,7 +459,7 @@ The Mamba branch is a standalone **Selective State Space Model (SSM)** (`BoneCan
 ### Final Performance Metrics (Untouched Test Set, n=695):
 - **Test Accuracy:** 85.76% (596 / 695 correct)
 - **Macro F1-Score:** 0.8573 | **Macro Precision:** 0.8588 | **Macro Recall:** 0.8624
-- **Cohen's Kappa ($\\kappa$):** 0.7157 | **MCC:** 0.7213
+- **Cohen's Kappa ($\\\\kappa$):** 0.7157 | **MCC:** 0.7213
 - **ROC-AUC:** 0.9468 | **PR-AUC:** 0.9443
 - **Training Time:** 88.06 minutes | **Inference Latency:** 29.78 ms/sample (33.6 FPS)
 - **Best Validation Epoch:** Epoch 19 (85.39% Val Acc)
@@ -483,7 +488,7 @@ Phase 6 evaluates the **Attention Fusion** mechanism under frozen pretrained bac
 ### Final Performance Metrics (Untouched Test Set, n=695):
 - **Test Accuracy:** **98.85%** (687 / 695 correct)
 - **Macro F1-Score:** 0.9884 | **Macro Precision:** 0.9884 | **Macro Recall:** 0.9884
-- **Cohen's Kappa ($\\kappa$):** 0.9767 | **MCC:** 0.9767
+- **Cohen's Kappa ($\\\\kappa$):** 0.9767 | **MCC:** 0.9767
 - **ROC-AUC:** 0.9978 | **PR-AUC:** 0.9971
 - **Training Time:** 0.82 minutes (49.2 seconds) | **Inference Latency:** 40.98 ms/sample (24.4 FPS)
 - **Best Validation Epoch:** Epoch 8 (98.85% Val Acc)
@@ -525,24 +530,24 @@ REPORTED PARAMETER SCALE                39,737,093 (~40 Million Parameters)
 ```
 
 ### Detailed Mathematical Formulation:
-Let $x \in \mathbb{R}^{B \times 3 \times 224 \times 224}$ be an input mini-batch.
-1. **Branch Projections:** Each backbone extracts a raw representation $h_k$ ($k \in \{\text{CNN}, \text{Swin}, \text{Mamba}\}$), projected to a common 256-D space:
-   $$f_k = \text{GELU}(\text{LayerNorm}(W_k h_k)) \in \mathbb{R}^{B \times 256}$$
-2. **Feature Stacking:** Projected representations are stacked into a 3D feature tensor $F = [f_{\text{CNN}}, f_{\text{Swin}}, f_{\text{Mamba}}] \in \mathbb{R}^{B \times 3 \times 256}$.
+Let $x \\in \\mathbb{R}^{B \\times 3 \\times 224 \\times 224}$ be an input mini-batch.
+1. **Branch Projections:** Each backbone extracts a raw representation $h_k$ ($k \\in \\{\\text{CNN}, \\text{Swin}, \\text{Mamba}\\}$), projected to a common 256-D space:
+   $$f_k = \\text{GELU}(\\text{LayerNorm}(W_k h_k)) \\in \\mathbb{R}^{B \\times 256}$$
+2. **Feature Stacking:** Projected representations are stacked into a 3D feature tensor $F = [f_{\\text{CNN}}, f_{\\text{Swin}}, f_{\\text{Mamba}}] \\in \\mathbb{R}^{B \\times 3 \\times 256}$.
 3. **Softmax Attention Score Generation:** For each branch $k$, an unnormalized scalar attention score $e_k$ is computed by a two-layer bottleneck MLP:
-   $$e_k = W_2 \, \text{GELU}(W_1 f_k + b_1) + b_2 \in \mathbb{R}^{B \times 1}$$
-   where $W_1 \in \mathbb{R}^{64 \times 256}$ and $W_2 \in \mathbb{R}^{1 \times 64}$.
-4. **Softmax Normalization:** Branch attention weights $\\alpha_k$ are normalized via Softmax across the 3 branches:
-   $$\\alpha_k = \frac{\exp(e_k)}{\sum_{j=1}^{3} \exp(e_j)}, \quad \sum_{k=1}^{3} \alpha_k = 1.0$$
-5. **Feature Fusion:** The fused feature vector $f_{\text{fused}} \in \mathbb{R}^{B \times 256}$ is computed via weighted summation:
-   $$f_{\text{fused}} = \sum_{k=1}^{3} \alpha_k \odot f_k$$
-6. **Classification Output:** $f_{\text{fused}}$ passes through the classification head to yield logits $y_{logits} \in \mathbb{R}^{B \times 2}$:
-   $$y_{logits} = W_{cls2} \, \text{GELU}(\text{LayerNorm}(W_{cls1} f_{\text{fused}} + b_{cls1})) + b_{cls2}$$
+   $$e_k = W_2 \\, \\text{GELU}(W_1 f_k + b_1) + b_2 \\in \\mathbb{R}^{B \\times 1}$$
+   where $W_1 \\in \\mathbb{R}^{64 \\times 256}$ and $W_2 \\in \\mathbb{R}^{1 \\times 64}$.
+4. **Softmax Normalization:** Branch attention weights $\\\\alpha_k$ are normalized via Softmax across the 3 branches:
+   $$\\\\alpha_k = \\frac{\\exp(e_k)}{\\sum_{j=1}^{3} \\exp(e_j)}, \\quad \\sum_{k=1}^{3} \\alpha_k = 1.0$$
+5. **Feature Fusion:** The fused feature vector $f_{\\text{fused}} \\in \\mathbb{R}^{B \\times 256}$ is computed via weighted summation:
+   $$f_{\\text{fused}} = \\sum_{k=1}^{3} \\alpha_k \\odot f_k$$
+6. **Classification Output:** $f_{\\text{fused}}$ passes through the classification head to yield logits $y_{logits} \\in \\mathbb{R}^{B \\times 2}$:
+   $$y_{logits} = W_{cls2} \\, \\text{GELU}(\\text{LayerNorm}(W_{cls1} f_{\\text{fused}} + b_{cls1})) + b_{cls2}$$
 
 ### Final Performance Metrics (Untouched Test Set, n=695):
 - **Test Accuracy:** **98.42%** (684 / 695 correct)
 - **Macro F1-Score:** 0.9840 | **Macro Precision:** 0.9839 | **Macro Recall:** 0.9842
-- **Cohen's Kappa ($\\kappa$):** 0.9680 | **MCC:** 0.9680
+- **Cohen's Kappa ($\\\\kappa$):** 0.9680 | **MCC:** 0.9680
 - **ROC-AUC:** 0.9990 | **PR-AUC:** 0.9987
 - **Training Time:** 88.65 minutes | **Inference Latency:** 35.19 ms/sample (28.4 FPS)
 - **Best Validation Epoch:** Epoch 16 (98.71% Val Acc)
@@ -646,7 +651,7 @@ The high PR-AUC values ($>0.997$) for all top four models confirm high precision
 
 Analysis of training history artifacts (`results/*_training_history.json`) reveals distinct learning dynamics:
 - **CNN (ResNet-18):** Converges rapidly within 7 epochs; validation loss reaches a minimum of $0.0821$ before stabilizing.
-- **Swin-Tiny:** Smooth monotonic loss decline over 15 epochs; validation accuracy rises steadily to peak at $98.57\%$.
+- **Swin-Tiny:** Smooth monotonic loss decline over 15 epochs; validation accuracy rises steadily to peak at $98.57\\%$.
 - **Mamba:** Exhibits gradual convergence over 19 epochs, reflecting learning from scratch without pretrained weights.
 - **Attention Fusion:** Extremely rapid optimization; reaches peak performance in $0.82$ minutes at Epoch 8.
 - **Joint Hybrid:** Balanced joint optimization; loss decreases steadily across both backbones and fusion head, reaching optimal validation performance at Epoch 16.
@@ -655,7 +660,7 @@ Analysis of training history artifacts (`results/*_training_history.json`) revea
 
 ## 28. OVERFITTING, GENERALIZATION, AND CROSS-SPLIT STABILITY
 
-A dedicated audit was conducted comparing best validation accuracy against untouched test accuracy to evaluate generalization gap $\\Delta = |\\text{Val Acc} - \\text{Test Acc}|$:
+A dedicated audit was conducted comparing best validation accuracy against untouched test accuracy to evaluate generalization gap $\\\\Delta = |\\\\text{Val Acc} - \\\\text{Test Acc}|$:
 
 ```text
 ===================================================================================
@@ -672,13 +677,13 @@ End-to-End Hybrid      98.71%             98.42%             0.29%        No Ove
 ```
 
 > [!NOTE]
-> **Scientifically Defensible Statement:** Under the finalized `derived_clean` evaluation protocol, **no substantial evidence of severe overfitting was observed** across any of the five locked model configurations. Generalization gaps remained below $0.5\%$ across all models. While a minimal cross-split gap confirms split stability, it does not guarantee universal generalization to unseen external clinical cohorts.
+> **Scientifically Defensible Statement:** Under the finalized `derived_clean` evaluation protocol, **no substantial evidence of severe overfitting was observed** across any of the five locked model configurations. Generalization gaps remained below $0.5\\%$ across all models. While a minimal cross-split gap confirms split stability, it does not guarantee universal generalization to unseen external clinical cohorts.
 
 ---
 
 ## 29. LEARNED ATTENTION ANALYSIS
 
-Extracting learned Softmax Branch Attention weights ($\\alpha_k$) across test samples provides insight into relative representation contributions:
+Extracting learned Softmax Branch Attention weights ($\\\\alpha_k$) across test samples provides insight into relative representation contributions:
 
 ```text
 ===================================================================================
@@ -697,8 +702,8 @@ End-to-End Hybrid (P7) 1.14% (std: 0.92%)  92.61% (std: 8.45%)  6.25% (std: 7.90
 ```
 
 ### Key Analytical Findings:
-1. **Swin-Tiny Dominance:** Swin-Tiny receives the primary attention weight ($78.27\%$ in Fusion, $92.61\%$ in Hybrid), reflecting its superior capacity for hierarchical visual feature extraction.
-2. **Class-Dependent Mamba Recruitment:** For Cancer samples, Mamba's attention weight increases significantly ($28.98\%$ in Fusion, $10.39\%$ in Hybrid) compared to Normal samples ($2.86\%$ and $1.16\%$). This demonstrates that sequential state space representations contribute disproportionately to identifying malignant tissue anomalies.
+1. **Swin-Tiny Dominance:** Swin-Tiny receives the primary attention weight ($78.27\\%$ in Fusion, $92.61\\%$ in Hybrid), reflecting its superior capacity for hierarchical visual feature extraction.
+2. **Class-Dependent Mamba Recruitment:** For Cancer samples, Mamba's attention weight increases significantly ($28.98\\%$ in Fusion, $10.39\\%$ in Hybrid) compared to Normal samples ($2.86\\%$ and $1.16\\%$). This demonstrates that sequential state space representations contribute disproportionately to identifying malignant tissue anomalies.
 3. **Attention Weight Scope Disclaimer:** Attention weights represent learned feature fusion coefficients within the classification head; they **do not constitute causal diagnostic explanations or pixel-level spatial saliency maps**.
 
 ---
@@ -734,14 +739,14 @@ Branch masking was conducted at inference time by applying multiplicative zero-m
 *Figure 24: Quantified accuracy impact of branch masking. Masking Swin-Tiny triggers a catastrophic 29.07% accuracy drop to 69.35%.*
 
 ### Detailed Masking Analysis:
-- **Masking Swin-Tiny (`w/o Swin`):** Accuracy drops catastrophically by **29.07%** (from $98.42\%$ to $69.35\%$), and Cohen's Kappa collapses to $0.3392$. This empirically proves that Swin-Tiny is the indispensable core backbone of the trained network.
+- **Masking Swin-Tiny (`w/o Swin`):** Accuracy drops catastrophically by **29.07%** (from $98.42\\%$ to $69.35\\%$), and Cohen's Kappa collapses to $0.3392$. This empirically proves that Swin-Tiny is the indispensable core backbone of the trained network.
 - **Correct Interpretation:** This result demonstrates that Swin-Tiny is highly influential in *this specific trained joint configuration*. It **does not prove** that Swin-Tiny is universally superior across all vision tasks or dataset regimes.
 
 ---
 
 ## 32. EQUAL WEIGHT VS LEARNED ATTENTION
 
-To evaluate the mathematical contribution of dynamic Softmax attention against unweighted averaging, an ablation was conducted setting $\\alpha = [1/3, 1/3, 1/3]$ fixed:
+To evaluate the mathematical contribution of dynamic Softmax attention against unweighted averaging, an ablation was conducted setting $\\\\alpha = [1/3, 1/3, 1/3]$ fixed:
 - **Equal Weighting Accuracy:** 98.71% (Macro F1 = 0.9869)
 - **Learned Dynamic Attention Accuracy:** 98.42% (Macro F1 = 0.9840)
 
@@ -749,7 +754,7 @@ To evaluate the mathematical contribution of dynamic Softmax attention against u
 
 ## 33. PROBABILITY DIFFERENTIATION AUDIT
 
-To verify that the identical $98.71\%$ accuracy across Equal Weighting, `w/o CNN`, and `w/o Mamba` represented authentic independent evaluations and not hardcoded artifacts, a probability distribution audit was executed via `src/evaluation/verify_ablations.py`:
+To verify that the identical $98.71\\%$ accuracy across Equal Weighting, `w/o CNN`, and `w/o Mamba` represented authentic independent evaluations and not hardcoded artifacts, a probability distribution audit was executed via `src/evaluation/verify_ablations.py`:
 
 ```text
 ===================================================================================
@@ -765,7 +770,7 @@ w/o Swin vs. All Configurations   485 / 695        99.04%          30.24%
 ===================================================================================
 ```
 
-**Conclusion:** The identical $98.71\%$ test accuracy across three ablation runs occurs because 686 out of 695 samples are classified with high confidence whenever Swin-Tiny features are present. Output probability distributions shift by up to **31.54%**, confirming authentic experimental independence and valid branch masking.
+**Conclusion:** The identical $98.71\\%$ test accuracy across three ablation runs occurs because 686 out of 695 samples are classified with high confidence whenever Swin-Tiny features are present. Output probability distributions shift by up to **31.54%**, confirming authentic experimental independence and valid branch masking.
 
 ---
 
@@ -884,7 +889,7 @@ The authors formally declare that:
    *A:* Strictly **39,737,093 trainable parameters (~40 Million)**.
 
 8. **Q: How was the Softmax attention score computed?**  
-   *A:* Projected 256D features pass through a two-layer bottleneck MLP ($256 \rightarrow 64 \rightarrow 1$) to generate unnormalized scores, normalized via Softmax across the 3 branches.
+   *A:* Projected 256D features pass through a two-layer bottleneck MLP ($256 \\rightarrow 64 \\rightarrow 1$) to generate unnormalized scores, normalized via Softmax across the 3 branches.
 
 9. **Q: Why use label smoothing (eps=0.05)?**  
    *A:* Label smoothing prevents overconfidence in logit outputs, improving probability calibration and reducing overfitting.
@@ -914,10 +919,10 @@ The authors formally declare that:
     *A:* Kappa and MCC measure statistical agreement and binary correlation accounting for chance agreement, ensuring robust evaluation beyond raw accuracy.
 
 18. **Q: What loss function was used?**  
-    *A:* Cross-Entropy Loss with label smoothing ($\\epsilon = 0.05$).
+    *A:* Cross-Entropy Loss with label smoothing ($\\\\epsilon = 0.05$).
 
 19. **Q: Why differential learning rates in Phase 7?**  
-    *A:* Lower learning rate ($2 \times 10^{-5}$) preserves pretrained backbone weights while a higher rate ($1 \times 10^{-4}$) optimizes the randomly initialized fusion head.
+    *A:* Lower learning rate ($2 \\times 10^{-5}$) preserves pretrained backbone weights while a higher rate ($1 \\times 10^{-4}$) optimizes the randomly initialized fusion head.
 
 20. **Q: How long did end-to-end Hybrid training take?**  
     *A:* **88.65 minutes** across 20 epochs.
@@ -926,10 +931,10 @@ The authors formally declare that:
     *A:* Yes, CLAHE is part of the deterministic preprocessing pipeline applied to all train, validation, and test images.
 
 22. **Q: What input image size was used?**  
-    *A:* $224 \times 224 \times 3$ RGB.
+    *A:* $224 \\times 224 \\times 3$ RGB.
 
 23. **Q: What is the patch size in the Mamba branch?**  
-    *A:* $16 \times 16$ pixels, yielding 196 tokens per image.
+    *A:* $16 \\times 16$ pixels, yielding 196 tokens per image.
 
 24. **Q: Why use ResNet-18 instead of ResNet-50 for the CNN branch?**  
     *A:* ResNet-18 provides efficient 512D feature extraction while keeping overall ensemble parameter count near ~40M.
@@ -941,7 +946,7 @@ The authors formally declare that:
     *A:* PyTorch `torch.amp.autocast(device_type='cuda', dtype=torch.float16)` was utilized with `GradScaler`.
 
 27. **Q: Did any training run experience NaN losses?**  
-    *A:* Zero NaN losses occurred after applying FP32 promotion to Mamba state recurrences and gradient clipping ($max\_norm=1.0$).
+    *A:* Zero NaN losses occurred after applying FP32 promotion to Mamba state recurrences and gradient clipping ($max\\_norm=1.0$).
 
 28. **Q: What is the main clinical takeaway of this study?**  
     *A:* Combining local, global, and sequential representations under clean data evaluation yields highly reliable bone cancer detection, though external clinical validation remains necessary.
@@ -1046,3 +1051,10 @@ src/
 
 ---
 *End of Final Master Technical Report — ICIMCPS-2026 Bone Cancer Project*
+"""
+    with open(report_path, "w", encoding="utf-8") as f:
+        f.write(content)
+    print(f"Successfully generated Godfather-level Master Markdown Report at: {report_path}")
+
+if __name__ == "__main__":
+    generate_report()
