@@ -1,6 +1,6 @@
 """
-CNN PyTorch to HDF5 (.h5) Converter and Verifier
-Converts PyTorch state_dict from checkpoints/cnn_best.pth into checkpoints/cnn_best.h5
+PyTorch to HDF5 (.h5) Converter and Verifier for Backbone Models (CNN, Swin-Tiny).
+Converts PyTorch state_dict from .pth checkpoints into .h5 container files
 and verifies structural integrity and numerical equality of saved weights.
 """
 
@@ -19,8 +19,9 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 from src.models.cnn import BoneCancerCNN
+from src.models.swin import BoneCancerSwin
 
-def export_pth_to_h5(pth_path, h5_path):
+def export_pth_to_h5(pth_path, h5_path, model_type='cnn'):
     print(f"Loading PyTorch checkpoint from: {pth_path}")
     checkpoint = torch.load(pth_path, map_location="cpu")
     
@@ -29,13 +30,15 @@ def export_pth_to_h5(pth_path, h5_path):
     val_acc = checkpoint.get("val_acc", None)
     val_loss = checkpoint.get("val_loss", None)
 
+    arch_desc = "BoneCancerCNN (ResNet18 backbone + 256D projection + 2-class head)" if model_type == 'cnn' else "BoneCancerSwin (Swin-Tiny backbone + 256D projection + 2-class head)"
+
     print(f"Exporting state_dict ({len(state_dict)} tensor keys) to HDF5 container: {h5_path}")
     
     os.makedirs(os.path.dirname(h5_path), exist_ok=True)
     
     with h5py.File(h5_path, "w") as h5f:
         # Save metadata attributes
-        h5f.attrs["architecture"] = "BoneCancerCNN (ResNet18 backbone + 256D projection + 2-class head)"
+        h5f.attrs["architecture"] = arch_desc
         h5f.attrs["input_shape"] = json.dumps([3, 224, 224])
         h5f.attrs["num_classes"] = 2
         h5f.attrs["class_mapping"] = json.dumps({"cancer": 0, "normal": 1})
@@ -56,8 +59,8 @@ def export_pth_to_h5(pth_path, h5_path):
 
     print(f"Successfully saved {h5_path} (Size: {os.path.getsize(h5_path) / (1024*1024):.2f} MB)")
 
-def verify_h5_export(h5_path, pth_path):
-    print("\n--- VERIFYING HDF5 EXPORT ---")
+def verify_h5_export(h5_path, pth_path, model_type='cnn'):
+    print(f"\n--- VERIFYING HDF5 EXPORT ({model_type.upper()}) ---")
     if not os.path.exists(h5_path):
         raise FileNotFoundError(f"Export file {h5_path} does not exist!")
         
@@ -99,8 +102,14 @@ def verify_h5_export(h5_path, pth_path):
         else:
             raise ValueError(f"VERIFICATION FAILED with {mismatches} mismatched tensors!")
 
-        # Verify loading into BoneCancerCNN PyTorch model instance
-        model = BoneCancerCNN(pretrained=False, feature_dim=256, num_classes=2)
+        # Verify loading into PyTorch model instance
+        if model_type == 'cnn':
+            model = BoneCancerCNN(pretrained=False, feature_dim=256, num_classes=2)
+        elif model_type == 'swin':
+            model = BoneCancerSwin(pretrained=False, feature_dim=256, num_classes=2)
+        else:
+            raise ValueError(f"Unknown model_type: {model_type}")
+
         model.load_state_dict(reconstructed_sd)
         model.eval()
         dummy_input = torch.randn(1, 3, 224, 224)
@@ -113,5 +122,5 @@ if __name__ == "__main__":
     pth_file = os.path.join(PROJECT_ROOT, "checkpoints", "cnn_best.pth")
     h5_file = os.path.join(PROJECT_ROOT, "checkpoints", "cnn_best.h5")
     
-    export_pth_to_h5(pth_file, h5_file)
-    verify_h5_export(h5_file, pth_file)
+    export_pth_to_h5(pth_file, h5_file, model_type='cnn')
+    verify_h5_export(h5_file, pth_file, model_type='cnn')

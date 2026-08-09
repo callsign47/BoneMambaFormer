@@ -63,6 +63,26 @@ Run the dataset audit script to verify dataset integrity and split distribution:
 python -m src.utils.dataset_audit
 ```
 
+### 3. Model Training & Baseline Execution
+
+#### Phase 3: ResNet-18 (CNN Branch Baseline)
+```bash
+# Train ResNet-18 backbone
+python -m src.training.train_cnn
+
+# Evaluate CNN baseline & export HDF5 (.h5) container
+python -m src.evaluation.evaluate_cnn
+```
+
+#### Phase 4: Swin-Tiny (Vision Transformer Baseline)
+```bash
+# Train Swin-Tiny backbone
+python -m src.training.train_swin
+
+# Evaluate Swin-Tiny baseline & export HDF5 (.h5) container
+python -m src.evaluation.evaluate_swin
+```
+
 ## 📜 License
 
 This project is developed for ICIMCPS-2026 research work.
