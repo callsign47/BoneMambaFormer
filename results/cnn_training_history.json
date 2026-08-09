@@ -1,0 +1,120 @@
+{
+  "model_name": "BoneCancerCNN (ResNet18 backbone + 256D projection)",
+  "split_type": "derived_clean",
+  "config": {
+    "project": {
+      "name": "ICIMCPS_2026_Bone_Cancer",
+      "workspace_root": "C:\\Users\\admin_fix\\Downloads\\BONE CANCER ICIMCPS",
+      "seed": 42
+    },
+    "dataset": {
+      "root": "C:\\Users\\admin_fix\\Downloads\\BONE CANCER ICIMCPS\\DATASET",
+      "split_type": "derived_clean",
+      "clean_split_json": "C:\\Users\\admin_fix\\Downloads\\BONE CANCER ICIMCPS\\results\\derived_leakage_clean_split.json",
+      "class_mapping": {
+        "cancer": 0,
+        "normal": 1
+      },
+      "num_classes": 2,
+      "input_size": [
+        224,
+        224
+      ],
+      "batch_size": 32,
+      "num_workers": 2
+    },
+    "preprocessing": {
+      "resize": [
+        224,
+        224
+      ],
+      "mean": [
+        0.485,
+        0.456,
+        0.406
+      ],
+      "std": [
+        0.229,
+        0.224,
+        0.225
+      ],
+      "enable_denoising": false,
+      "enable_clahe": true,
+      "clahe_clip_limit": 2.0,
+      "clahe_tile_grid": [
+        8,
+        8
+      ]
+    },
+    "augmentation": {
+      "rotation_degrees": 15,
+      "flip_prob": 0.5,
+      "zoom_scale": [
+        0.9,
+        1.1
+      ],
+      "brightness": 0.1,
+      "contrast": 0.1,
+      "elastic_transform": {
+        "alpha": 10.0,
+        "sigma": 3.0,
+        "prob": 0.3
+      }
+    }
+  },
+  "hyperparameters": {
+    "epochs": 20,
+    "batch_size": 32,
+    "learning_rate": 0.0001,
+    "weight_decay": 0.0001,
+    "seed": 42,
+    "optimizer": "AdamW",
+    "scheduler": "CosineAnnealingLR"
+  },
+  "best_checkpoint": {
+    "epoch": 1,
+    "checkpoint_path": "C:\\Users\\admin_fix\\Downloads\\BONE CANCER ICIMCPS\\checkpoints\\cnn_best.pth",
+    "val_accuracy": 0.9469914040114613,
+    "val_loss": 0.14907495621965403,
+    "val_f1": 0.9463035618124471,
+    "val_precision": 0.944239501741094,
+    "val_recall": 0.9498241206030151
+  },
+  "total_training_time_sec": 505.8405933380127,
+  "total_training_time_min": 8.430676555633545,
+  "gpu_usage": {
+    "device_name": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+    "max_memory_allocated_mb": 862.275390625,
+    "max_memory_reserved_mb": 1380.0
+  },
+  "epoch_history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.23964420202865874,
+      "train_acc": 0.8932182823243899,
+      "train_f1": 0.8895650796787673,
+      "val_loss": 0.14907495621965403,
+      "val_acc": 0.9469914040114613,
+      "val_precision": 0.944239501741094,
+      "val_recall": 0.9498241206030151,
+      "val_f1": 0.9463035618124471,
+      "lr": 9.939057285945933e-05,
+      "epoch_time_sec": 266.7138681411743,
+      "is_best": true
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.14605215938606883,
+      "train_acc": 0.942834029931239,
+      "train_f1": 0.9409787768869815,
+      "val_loss": 0.16005741986299313,
+      "val_acc": 0.9340974212034384,
+      "val_precision": 0.9331805938772828,
+      "val_recall": 0.9418006700167505,
+      "val_f1": 0.9337006079027356,
+      "lr": 9.757729755661012e-05,
+      "epoch_time_sec": 238.2522373199463,
+      "is_best": false
+    }
+  ]
+}

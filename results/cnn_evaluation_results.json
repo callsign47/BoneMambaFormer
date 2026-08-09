@@ -1,0 +1,73 @@
+{
+  "model_name": "BoneCancerCNN (ResNet18 backbone + 256D feature projection)",
+  "eval_split": "derived_clean (Test Split)",
+  "checkpoint_path_pth": "C:\\Users\\admin_fix\\Downloads\\BONE CANCER ICIMCPS\\checkpoints\\cnn_best.pth",
+  "checkpoint_path_h5": "C:\\Users\\admin_fix\\Downloads\\BONE CANCER ICIMCPS\\checkpoints\\cnn_best.h5",
+  "best_checkpoint_epoch": 7,
+  "val_accuracy_at_best_epoch": 0.9770773638968482,
+  "val_loss_at_best_epoch": 0.0717013320995009,
+  "test_samples_count": 695,
+  "timing_metrics": {
+    "total_training_time_sec": 1718.5,
+    "total_training_time_min": 28.64,
+    "total_inference_time_sec": 20.4189,
+    "per_sample_latency_ms": 29.38,
+    "inference_throughput_fps": 34.0
+  },
+  "overall_metrics": {
+    "accuracy": 0.9726618705035971,
+    "macro_precision": 0.9722454543933894,
+    "macro_recall": 0.9725220927897168,
+    "macro_f1_score": 0.9723816993464052,
+    "cohens_kappa": 0.944763514220101,
+    "matthews_corrcoef_mcc": 0.9447675066817129,
+    "roc_auc": 0.9976819307759256,
+    "pr_auc": 0.9972382524558353
+  },
+  "confusion_matrix": {
+    "positive_class": "cancer (0)",
+    "negative_class": "normal (1)",
+    "true_positives_TP": 373,
+    "false_negatives_FN": 10,
+    "false_positives_FP": 9,
+    "true_negatives_TN": 303,
+    "raw_matrix": [
+      [
+        373,
+        10
+      ],
+      [
+        9,
+        303
+      ]
+    ]
+  },
+  "per_class_metrics": {
+    "cancer (0)": {
+      "precision": 0.9764397905759162,
+      "recall": 0.9738903394255874,
+      "f1_score": 0.9751633986928104,
+      "sensitivity": 0.9738903394255874,
+      "specificity": 0.9711538461538461,
+      "support": 383
+    },
+    "normal (1)": {
+      "precision": 0.9680511182108626,
+      "recall": 0.9711538461538461,
+      "f1_score": 0.9696,
+      "sensitivity": 0.9711538461538461,
+      "specificity": 0.9738903394255874,
+      "support": 312
+    }
+  },
+  "generated_artifacts": {
+    "checkpoint_pth": "C:\\Users\\admin_fix\\Downloads\\BONE CANCER ICIMCPS\\checkpoints\\cnn_best.pth",
+    "checkpoint_h5": "C:\\Users\\admin_fix\\Downloads\\BONE CANCER ICIMCPS\\checkpoints\\cnn_best.h5",
+    "evaluation_json": "C:\\Users\\admin_fix\\Downloads\\BONE CANCER ICIMCPS\\results\\cnn_evaluation_results.json",
+    "classification_report_txt": "C:\\Users\\admin_fix\\Downloads\\BONE CANCER ICIMCPS\\results\\cnn_classification_report.txt",
+    "classification_report_md": "C:\\Users\\admin_fix\\Downloads\\BONE CANCER ICIMCPS\\reports\\cnn_classification_report.md",
+    "confusion_matrix_plot": "C:\\Users\\admin_fix\\Downloads\\BONE CANCER ICIMCPS\\figures\\cnn_confusion_matrix.png",
+    "roc_curve_plot": "C:\\Users\\admin_fix\\Downloads\\BONE CANCER ICIMCPS\\figures\\cnn_roc_curve.png",
+    "pr_curve_plot": "C:\\Users\\admin_fix\\Downloads\\BONE CANCER ICIMCPS\\figures\\cnn_pr_curve.png"
+  }
+}

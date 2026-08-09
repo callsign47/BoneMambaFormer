@@ -18,7 +18,7 @@ class ProjectConfig:
             },
             'dataset': {
                 'root': os.path.join(workspace_root, 'DATASET'),
-                'split_type': 'original', # 'original' or 'derived_clean'
+                'split_type': 'derived_clean', # 'original' or 'derived_clean'
                 'clean_split_json': os.path.join(workspace_root, 'results', 'derived_leakage_clean_split.json'),
                 'class_mapping': {
                     'cancer': 0,

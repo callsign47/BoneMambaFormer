@@ -64,11 +64,9 @@ class MedicalImageAugmentor:
         angle = random.uniform(-self.rotation_degrees, self.rotation_degrees)
         img_aug = TF.rotate(img_aug, angle)
 
-        # 3. Flips
+        # 3. Flips (Horizontal flip only, vertical flip disabled)
         if random.random() < self.flip_prob:
             img_aug = TF.hflip(img_aug)
-        if random.random() < self.flip_prob:
-            img_aug = TF.vflip(img_aug)
 
         # 4. Zoom / Rescale
         scale = random.uniform(self.zoom_scale[0], self.zoom_scale[1])
