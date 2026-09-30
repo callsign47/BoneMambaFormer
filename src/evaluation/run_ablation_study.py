@@ -342,7 +342,7 @@ Below is the verified performance matrix covering all 5 locked primary configura
 | **1. CNN (ResNet18)** | Locked Baseline | 97.27% | 0.9724 | 0.9977 | 0.9972 | 0.9448 | 0.9448 | 11.2M | 29.38 ms |
 | **2. Swin-Tiny** | Locked Baseline | 98.13% | 0.9811 | 0.9991 | 0.9990 | 0.9623 | 0.9625 | 27.5M | 28.66 ms |
 | **3. Mamba (SSM)** | Locked Baseline | 85.76% | 0.8573 | 0.9468 | 0.9443 | 0.7157 | 0.7213 | 1.0M | 29.78 ms |
-| **4. Attention Fusion (Frozen)** | Locked Baseline | 98.85% | 0.9884 | 0.9978 | 0.9971 | 0.9767 | 0.9767 | 25.7K (~40M tot) | 40.98 ms |
+| **4. Attention Fusion (Frozen)** | Locked Baseline | 98.85% | 0.9884 | 0.9978 | 0.9971 | 0.9767 | 0.9767 | 49,923 (39.74M Total Legacy ResNet-18) | 40.98 ms |
 | **5. Hybrid (End-to-End)** | Locked Baseline | **98.42%** | **0.9840** | **0.9990** | **0.9987** | **0.9680** | **0.9680** | **39,737,093 (~40M)** | **33.55 ms** |
 | **Equal Weighting (Fixed $\\alpha$)** | Fusion Ablation | 97.70% | 0.9768 | 0.9983 | 0.9980 | 0.9535 | 0.9536 | ~40M | 33.50 ms |
 | **Swin + Mamba (w/o CNN)** | Branch Ablation | 98.13% | 0.9811 | 0.9989 | 0.9986 | 0.9623 | 0.9625 | ~40M | 33.20 ms |

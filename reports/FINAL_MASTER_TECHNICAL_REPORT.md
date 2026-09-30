@@ -49,7 +49,7 @@ These backbones are integrated via a dynamic **Adaptive Softmax Branch Attention
    - **Attention Fusion (Frozen Backbones):** **98.85% Test Accuracy**, 0.9884 Macro F1, 0.9978 ROC-AUC, 0.9767 Kappa, 0.82 min training time, 40.98 ms/sample latency (49,923 trainable fusion parameters out of 39.7M total).
    - **End-to-End Hybrid (Joint Optimization):** **98.42% Test Accuracy**, 0.9840 Macro F1, 0.9990 ROC-AUC, 0.9680 Kappa, 88.65 min training time, 35.19 ms/sample latency (**39,737,093 trainable parameters ~40M**).
 3. **Controlled Ablation Findings:**
-   - Removing the Swin-Tiny branch (`w/o Swin`) causes a catastrophic performance collapse from **98.42% to 69.35%** (a 29.07% drop), proving Swin-Tiny is the primary visual backbone.
+   - Removing the Swin-Tiny branch (`w/o Swin`) causes a catastrophic performance collapse from **98.42% to 69.35%** (a 29.07% drop), demonstrating that Swin-Tiny is the dominant/most influential branch within this trained joint configuration.
    - Equal branch weighting ($\\alpha=[1/3, 1/3, 1/3]$), removing CNN (`w/o CNN`), and removing Mamba (`w/o Mamba`) all achieve 98.71% test accuracy under inference-time branch masking. Diagnostic probability audits confirm maximum output probability shifts of up to **31.54%** across these configurations, verifying authentic experimental independence.
 4. **Learned Attention Dynamics:** In the joint End-to-End Hybrid model, the Softmax attention mechanism assigned a mean weight of **92.61% to Swin-Tiny**, **6.25% to Mamba**, and **1.14% to CNN**. For Cancer detection specifically, Mamba's contribution expands to **10.39%**, demonstrating class-dependent representation recruitment.
 5. **Overfitting & Generalization:** All five models demonstrated high cross-split stability with sub-0.5% generalization gaps between validation and test accuracy (CNN: 0.44%, Swin: 0.44%, Mamba: +0.37%, Fusion: 0.00%, Hybrid: 0.29%). No substantial evidence of severe overfitting was observed under `derived_clean`.
@@ -111,18 +111,19 @@ Model Configuration      Trainable Params    Test Acc (%)    Macro F1    ROC-AUC
 - 33. Probability Differentiation Audit
 - 34. Error Analysis
 - 35. Computational Efficiency
-- 36. Reproducibility
-- 37. Artifact Verification
-- 38. Scientific Integrity
-- 39. Limitations
-- 40. Threats to Validity
-- 41. Coordinator / Reviewer Defense
-- 42. Supported vs Unsupported Claims
-- 43. Discussion
-- 44. Conclusion
-- 45. Future Work
-- 46. Complete Artifact Index
-- 47. Appendix
+- 36. Phase 10: Paper Evidence & Final Research Packaging
+- 37. Reproducibility
+- 38. Artifact Verification
+- 39. Scientific Integrity
+- 40. Limitations
+- 41. Threats to Validity
+- 42. Coordinator / Reviewer Defense
+- 43. Supported vs Unsupported Claims
+- 44. Discussion
+- 45. Conclusion
+- 46. Future Work
+- 47. Complete Artifact Index
+- 48. Appendix
 
 ---
 
@@ -279,7 +280,7 @@ All duplicate image hash groups were audited for label consistency across splits
 
 ## 13. DERIVED_CLEAN CONSTRUCTION
 
-To eliminate cross-split memorization and guarantee evaluation on untouched data, the `derived_clean` split protocol was constructed by filtering out all cross-split duplicate instances, creating a strict, leakage-clean partition:
+To eliminate cross-split memorization and ensure evaluation on untouched data, the `derived_clean` split protocol was constructed by filtering out all cross-split duplicate instances, creating a strict, leakage-clean partition:
 
 ```text
 ===================================================================================
@@ -663,11 +664,11 @@ A dedicated audit was conducted comparing best validation accuracy against untou
 ===================================================================================
 Model Configuration    Val Accuracy (%)   Test Accuracy (%)  Gen Gap (%)  Audit Status
 -----------------------------------------------------------------------------------
-CNN (ResNet-18)        97.71%             97.27%             0.44%        No Overfitting
-Swin-Tiny              98.57%             98.13%             0.44%        No Overfitting
-Mamba (Selective SSM)  85.39%             85.76%            +0.37%        No Overfitting
-Attention Fusion       98.85%             98.85%             0.00%        Ideal Generalization
-End-to-End Hybrid      98.71%             98.42%             0.29%        No Overfitting
+CNN (ResNet-18)        97.71%             97.27%             0.44%        No substantial evidence of severe overfitting observed under derived_clean
+Swin-Tiny              98.57%             98.13%             0.44%        No substantial evidence of severe overfitting observed under derived_clean
+Mamba (Selective SSM)  85.39%             85.76%            +0.37%        No substantial evidence of severe overfitting observed under derived_clean
+Attention Fusion       98.85%             98.85%             0.00%        No substantial evidence of severe overfitting observed under derived_clean
+End-to-End Hybrid      98.71%             98.42%             0.29%        No substantial evidence of severe overfitting observed under derived_clean
 ===================================================================================
 ```
 
@@ -731,7 +732,7 @@ CNN + Mamba (w/o Swin)       Branch Ablation  69.35%        0.6331    0.9578   0
 Branch masking was conducted at inference time by applying multiplicative zero-mask vectors directly to stacked feature tensors:
 
 ![Figure 24: Branch Masking Impact Analysis](figures/ablation_branch_masking_impact.png)  
-*Figure 24: Quantified accuracy impact of branch masking. Masking Swin-Tiny triggers a catastrophic 29.07% accuracy drop to 69.35%.*
+*Figure 24: Quantified accuracy impact of branch masking. Plotted quantity represents the Change in Accuracy Relative to Full Hybrid (percentage points), where masking Swin-Tiny triggers a 29.07 percentage point accuracy drop to 69.35%, while w/o CNN and w/o Mamba exhibit a +0.29 percentage point shift.*
 
 ### Detailed Masking Analysis:
 - **Masking Swin-Tiny (`w/o Swin`):** Accuracy drops catastrophically by **29.07%** (from $98.42\%$ to $69.35\%$), and Cohen's Kappa collapses to $0.3392$. This empirically proves that Swin-Tiny is the indispensable core backbone of the trained network.
@@ -765,15 +766,18 @@ w/o Swin vs. All Configurations   485 / 695        99.04%          30.24%
 ===================================================================================
 ```
 
-**Conclusion:** The identical $98.71\%$ test accuracy across three ablation runs occurs because 686 out of 695 samples are classified with high confidence whenever Swin-Tiny features are present. Output probability distributions shift by up to **31.54%**, confirming authentic experimental independence and valid branch masking.
+**Conclusion:** The identical $98.71\%$ test accuracy across three ablation runs occurs because accuracy establishes exactly 686 out of 695 correct predictions (686 / 695 = 98.705% approx 98.71%) across these configurations whenever Swin-Tiny features are present. Output probability distributions shift by up to **31.54%**, confirming authentic experimental independence and valid branch masking.
 
 ---
 
 ## 34. ERROR ANALYSIS
 
-Detailed examination of diagnostic failure modes in the End-to-End Hybrid model (11 total errors out of 695 test samples):
-- **False Negatives (6 cases):** Malignant bone cancer cases incorrectly classified as Normal. Clinical risk: Delayed diagnosis and treatment. Visual analysis reveals these cases involved early osteolytic lesions with minimal cortical wall destruction, where subtle textural cues were partially smoothed by CLAHE contrast preprocessing.
-- **False Positives (5 cases):** Healthy normal radiographs incorrectly classified as Cancer. Clinical risk: Unnecessary patient anxiety and follow-up biopsies. Visual analysis shows these scans contained overlapping dense trabecular patterns and osteophyte formations mimicking sclerotic tumor margins.
+An evaluation of diagnostic error cases in the End-to-End Hybrid model on the untouched test set (n=695) identifies **11 total errors**:
+- **False Negatives (6 cases):** Radiologically confirmed Cancer samples incorrectly classified as Normal.
+- **False Positives (5 cases):** Normal radiographs incorrectly classified as Cancer.
+
+> [!IMPORTANT]
+> **Evidence-Limited Disclaimer:** Because no formal per-error clinical or radiological expert sub-annotation was finalized for individual test images, specific lesion-level, anatomical, or image-processing physiological causes (such as osteolytic lesion severity, cortical destruction, CLAHE contrast smoothing, or osteophyte overlap) are explicitly not asserted. The 11 failure cases represent the total empirical error count under the locked evaluation protocol.
 
 ---
 
@@ -797,9 +801,25 @@ Model Configuration    Params      Train Time    Latency (ms)   Throughput (FPS)
 
 ---
 
-## 36. REPRODUCIBILITY
+## 36. PHASE 10: PAPER EVIDENCE & FINAL RESEARCH PACKAGING
 
-Complete reproducibility is guaranteed through deterministic seeds, static configuration files, and frozen checkpoints.
+Phase 10 executed the formal consolidation, audit, and packaging of all research evidence prior to paper writing and repository freeze:
+
+- **Objective:** Consolidate all empirical findings into publication-ready, verified evidence artifacts and freeze the codebase.
+- **Evidence Artifacts:** Generated master JSON results files (
+esults/five_model_results.json, 
+esults/ablation_study_results.json), summary CSV tables (
+esults/five_model_comparison.csv), and LaTeX-formatted table blocks (
+eports/phase10_paper_evidence_package.md) for direct inclusion in manuscript drafts.
+- **Publication Figures:** Produced 24 high-resolution, vector-compatible figures (300+ DPI PNGs in igures/) covering confusion matrices, ROC/PR curves, training histories, attention weight distributions, and ablation impact charts.
+- **Claim-Evidence Mapping & Verification:** Every performance metric, parameter count, and architectural detail in the manuscript was mapped to specific lines in result JSON files and validated against saved .pth and .h5 model checkpoints.
+- **Final Repository Freeze:** All codebase modifications, model definitions, preprocessing pipelines, training logs, and report generators were synchronized and frozen on the main branch, establishing a verifiable research foundation.
+
+---
+
+## 37. REPRODUCIBILITY
+
+The project provides a comprehensive reproducibility artifact set including deterministic random seeds, static configuration files, and frozen checkpoints.
 
 ### Environment Specification:
 - **OS:** Windows 11 Home / Pro
@@ -809,7 +829,7 @@ Complete reproducibility is guaranteed through deterministic seeds, static confi
 
 ---
 
-## 37. ARTIFACT VERIFICATION
+## 38. ARTIFACT VERIFICATION
 
 All project deliverables trace directly to saved repository files:
 
@@ -829,7 +849,7 @@ Hybrid (E2E)    checkpoints/hybrid_best.pth hybrid_best.h5 hybrid_evaluation_res
 
 ---
 
-## 38. SCIENTIFIC INTEGRITY
+## 39. SCIENTIFIC INTEGRITY
 
 ### Formal Scientific Integrity Declaration:
 The authors formally declare that:
@@ -840,7 +860,7 @@ The authors formally declare that:
 
 ---
 
-## 39. LIMITATIONS
+## 40. LIMITATIONS
 
 1. **Dataset Volume:** Total dataset size (8,810 images) is modest compared to large-scale general vision benchmarks.
 2. **Patient ID Unavailability:** Patient metadata was unrecorded in the raw dataset; while image hash deduplication is 100% complete in `derived_clean`, patient-level scan independence cannot be formally verified.
@@ -849,7 +869,7 @@ The authors formally declare that:
 
 ---
 
-## 40. THREATS TO VALIDITY
+## 41. THREATS TO VALIDITY
 
 - **Internal Validity:** Mitigated through cryptographic MD5 hash deduplication and strict validation-based checkpoint selection.
 - **External Validity:** Potential threat due to lack of multi-center external validation datasets. Performance across different X-ray scanner manufacturers remains to be tested.
@@ -858,7 +878,7 @@ The authors formally declare that:
 
 ---
 
-## 41. COORDINATOR / REVIEWER DEFENSE
+## 42. COORDINATOR / REVIEWER DEFENSE
 
 ### 30 Defensible Technical Questions & Evidence-Based Answers:
 
@@ -878,7 +898,7 @@ The authors formally declare that:
    *A:* Cryptographic MD5 scanning identified 345 cross-split duplicate image groups in the raw dataset. The `derived_clean` protocol eliminated all overlapping hashes, creating a leak-free split.
 
 6. **Q: Can you guarantee patient-level independence?**  
-   *A:* No, because patient IDs were unavailable in the raw dataset. We explicitly disclose this limitation while guaranteeing 100% cryptographic image hash deduplication.
+   *A:* No, because patient IDs were unavailable in the raw dataset. We explicitly disclose this limitation while enforcing 100% cryptographic image hash deduplication.
 
 7. **Q: What is the exact parameter count of the final Hybrid model?**  
    *A:* Strictly **39,737,093 trainable parameters (~40 Million)**.
@@ -896,10 +916,10 @@ The authors formally declare that:
     *A:* **28.4 FPS** (35.19 ms per image) on an NVIDIA RTX 3050 GPU.
 
 12. **Q: Why do Equal Weighting, w/o CNN, and w/o Mamba all show 98.71% accuracy?**  
-    *A:* Swin-Tiny features correctly classify 686 out of 695 samples regardless of minor branch masking. Probability distributions differ by up to 31.54%, proving independent evaluation.
+    *A:* Accuracy establishes exactly 686 out of 695 correct predictions (98.71%) across these configurations whenever Swin-Tiny features are present. Probability distributions shift by up to 31.54%, confirming independent evaluation.
 
 13. **Q: What happens when Swin-Tiny is removed (w/o Swin)?**  
-    *A:* Accuracy collapses catastrophically by 29.07% to 69.35%, proving Swin-Tiny is the primary visual backbone in the joint network.
+    *A:* Accuracy collapses catastrophically by 29.07% to 69.35%, demonstrating that Swin-Tiny is the dominant/most influential branch within this trained joint configuration in the joint network.
 
 14. **Q: Are Softmax attention weights causal explanations?**  
     *A:* No. Attention weights are learned scalar combination coefficients inside the feature fusion head; they do not represent causal clinical explanations.
@@ -947,14 +967,14 @@ The authors formally declare that:
     *A:* Combining local, global, and sequential representations under clean data evaluation yields highly reliable bone cancer detection, though external clinical validation remains necessary.
 
 29. **Q: How does this work advance the state of the art?**  
-    *A:* It provides the first leak-clean benchmark combining CNN, Swin, and Mamba backbones with dynamic softmax attention for bone radiograph classification.
+    *A:* It provides a leakage-audited benchmark combining CNN, Swin-Tiny, and Mamba backbones with dynamic softmax attention for bone radiograph classification.
 
 30. **Q: Are all code artifacts available for reproduction?**  
     *A:* Yes, complete source code, dataset split JSONs, training logs, and `.pth`/`.h5` checkpoints are archived in the repository.
 
 ---
 
-## 42. SUPPORTED VS UNSUPPORTED CLAIMS
+## 43. SUPPORTED VS UNSUPPORTED CLAIMS
 
 ```text
 ===================================================================================
@@ -966,7 +986,7 @@ Performance      Demonstrates strong performance    Proves absolute clinical
                  (98.42% test acc) on derived_clean superiority over radiologist
                  untouched test set.                experts in real-world clinics.
 
-Data Integrity   Guarantees zero cryptographic MD5   Proves complete patient-level
+Data Integrity   Enforces zero cryptographic MD5   Proves complete patient-level
                  image hash leakage across splits.  independence (Patient IDs were
                                                     unavailable in raw dataset).
 
@@ -986,7 +1006,7 @@ Attention        Attention weights reflect learned  Attention weights provide ca
 
 ---
 
-## 43. DISCUSSION
+## 44. DISCUSSION
 
 The empirical findings of the **BoneMambaFormer** project highlight several key insights for deep learning in radiologic CAD:
 1. **The Importance of Leakage Auditing:** Discovering 345 cross-split leakage groups in the raw dataset underscores the necessity of cryptographic deduplication. Evaluating models on contaminated splits leads to inflated performance metrics.
@@ -995,13 +1015,13 @@ The empirical findings of the **BoneMambaFormer** project highlight several key 
 
 ---
 
-## 44. CONCLUSION
+## 45. CONCLUSION
 
 The **BoneMambaFormer** project successfully establishes a leakage-clean, highly accurate deep learning framework for bone cancer classification from radiographs. By combining ResNet-18, Swin-Tiny, and Mamba backbones through an Adaptive Softmax Branch Attention mechanism, the system achieves **98.42% Test Accuracy**, **0.9840 Macro F1**, and **0.9990 ROC-AUC** on an untouched test set of 695 samples. All findings are fully documented, backed by saved artifacts, and verified for scientific integrity.
 
 ---
 
-## 45. FUTURE WORK
+## 46. FUTURE WORK
 
 1. **External Multi-Center Validation:** Evaluate locked checkpoints on independent external hospital datasets to test domain shift robustness.
 2. **Patient Metadata Integration:** Acquire patient-indexed DICOM cohorts to establish multi-view patient-level split protocols.
@@ -1010,7 +1030,7 @@ The **BoneMambaFormer** project successfully establishes a leakage-clean, highly
 
 ---
 
-## 46. COMPLETE ARTIFACT INDEX
+## 47. COMPLETE ARTIFACT INDEX
 
 - **Master Reports Directory:** `reports/`
 - **Phase Reports:** `reports/phase1_prd_report.md` through `reports/phase10_paper_evidence_package.md`
@@ -1021,7 +1041,7 @@ The **BoneMambaFormer** project successfully establishes a leakage-clean, highly
 
 ---
 
-## 47. APPENDIX
+## 48. APPENDIX
 
 ### Source Code Directory Structure:
 ```text

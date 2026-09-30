@@ -26,8 +26,8 @@
 | **Matthews Correlation Coefficient (MCC)** | **0.7213** |
 | **ROC-AUC** | **0.9468** |
 | **PR-AUC** | **0.9443** |
-| **Inference Latency** | **29.78 ms / sample** |
-| **Inference Throughput** | **33.6 FPS** |
+| **Inference Latency** | **27.93 ms / sample** |
+| **Inference Throughput** | **35.8 FPS** |
 
 ## Per-Class Breakdown
 

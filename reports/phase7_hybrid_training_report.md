@@ -13,7 +13,7 @@
 
 Phase 7 final end-to-end hybrid model training has been successfully executed and evaluated. Unlike Phase 6 (where backbones were frozen), Phase 7 optimized the complete **CNN (ResNet-18) + Swin-Tiny + Mamba (Selective SSM)** architecture jointly end-to-end alongside the **Softmax Branch Attention** mechanism and classification head.
 
-The joint model was trained on the `derived_clean` split ($7,417$ training images, $698$ validation images, $695$ untouched test images) using differential learning rates ($2\times 10^{-5}$ for backbones, $1\times 10^{-4}$ for fusion head) and Automatic Mixed Precision (AMP). The best checkpoint was selected strictly based on validation accuracy (Epoch 16: **98.71% Val Acc**).
+The joint model was trained on the `derived_clean` split ($7,417$ training images, $698$ validation images, $695$ untouched test images) using differential learning rates ($2\times 10^{-5}$ for backbones, $1\times 10^{-4}$ for fusion head) and Automatic Mixed Precision (AMP). The best checkpoint was selected strictly based on validation accuracy (Epoch 1: **99.00% Val Acc**).
 
 ---
 
@@ -23,9 +23,9 @@ The end-to-end fine-tuned attention mechanism learned the following relative bra
 
 | Branch | Backbone Architecture | Mean Attention Weight (%) | Cancer Class Weight (%) | Normal Class Weight (%) |
 |---|---|---|---|---|
-| **CNN** | ResNet-18 | **1.14%** | 1.77% | 0.38% |
-| **Swin** | Swin-Tiny | **92.61%** | 87.84% | 98.46% |
-| **Mamba** | Selective SSM | **6.25%** | 10.39% | 1.16% |
+| **CNN** | ResNet-18 | **31.29%** | 37.99% | 23.06% |
+| **Swin** | Swin-Tiny | **55.68%** | 46.17% | 67.35% |
+| **Mamba** | Selective SSM | **13.03%** | 15.84% | 9.59% |
 
 ---
 
@@ -33,17 +33,17 @@ The end-to-end fine-tuned attention mechanism learned the following relative bra
 
 | Metric Category | Metric | Score / Value |
 |---|---|---|
-| **Overall Performance** | **Test Accuracy** | **98.42%** ($684 / 695$ correct) |
-| | **Macro F1-Score** | **0.9840** |
-| | **Macro Precision** | **0.9839** |
-| | **Macro Recall** | **0.9842** |
-| **Statistical Agreement** | **Cohen’s Kappa ($\kappa$)** | **0.9680** |
-| | **Matthews Correlation Coef (MCC)** | **0.9680** |
-| **Discriminative Ability** | **ROC-AUC Score** | **0.9990** |
-| | **PR-AUC Score (Avg Precision)** | **0.9987** |
-| **Timing & Latency** | **Total Training Duration** | **88.65 minutes** (5319.3 seconds) |
-| | **Inference Latency** | **33.55 ms / sample** |
-| | **Inference Throughput** | **29.8 FPS** (CUDA) |
+| **Overall Performance** | **Test Accuracy** | **97.99%** ($681 / 695$ correct) |
+| | **Macro F1-Score** | **0.9797** |
+| | **Macro Precision** | **0.9788** |
+| | **Macro Recall** | **0.9808** |
+| **Statistical Agreement** | **Cohen’s Kappa ($\kappa$)** | **0.9594** |
+| | **Matthews Correlation Coef (MCC)** | **0.9596** |
+| **Discriminative Ability** | **ROC-AUC Score** | **0.9993** |
+| | **PR-AUC Score (Avg Precision)** | **0.9992** |
+| **Timing & Latency** | **Total Training Duration** | **17.40 minutes** (1043.7 seconds) |
+| | **Inference Latency** | **35.15 ms / sample** |
+| | **Inference Throughput** | **28.5 FPS** (CUDA) |
 
 ---
 
@@ -51,20 +51,20 @@ The end-to-end fine-tuned attention mechanism learned the following relative bra
 
 ```text
                            Predicted Cancer (0)    Predicted Normal (1)
-True Cancer (0) (n=383)           377 (TP)                6 (FN)
-True Normal (1) (n=312)             5 (FP)               307 (TN)
+True Cancer (0) (n=383)           372 (TP)                11 (FN)
+True Normal (1) (n=312)             3 (FP)               309 (TN)
 ```
 
-- **True Positives (TP)**: **377** (True Cancer correctly predicted as Cancer)
-- **False Negatives (FN)**: **6** (True Cancer incorrectly predicted as Normal)
-- **False Positives (FP)**: **5** (True Normal incorrectly predicted as Cancer)
-- **True Negatives (TN)**: **307** (True Normal correctly predicted as Normal)
+- **True Positives (TP)**: **372** (True Cancer correctly predicted as Cancer)
+- **False Negatives (FN)**: **11** (True Cancer incorrectly predicted as Normal)
+- **False Positives (FP)**: **3** (True Normal incorrectly predicted as Cancer)
+- **True Negatives (TN)**: **309** (True Normal correctly predicted as Normal)
 
 | Class Name | Label | Precision | Recall (Sensitivity) | Specificity | F1-Score | Support |
 |---|---|---|---|---|---|---|
-| **Cancer** | `0` | **98.69%** | **98.43%** | 98.40% | **0.9856** | 383 |
-| **Normal** | `1` | **98.08%** | **98.40%** | 98.43% | **0.9824** | 312 |
-| **Macro Average** | — | **98.39%** | **98.42%** | **98.42%** | **0.9840** | 695 |
+| **Cancer** | `0` | **99.20%** | **97.13%** | 99.04% | **0.9815** | 383 |
+| **Normal** | `1` | **96.56%** | **99.04%** | 97.13% | **0.9778** | 312 |
+| **Macro Average** | — | **97.88%** | **98.08%** | **98.08%** | **0.9797** | 695 |
 
 ---
 
@@ -72,7 +72,7 @@ True Normal (1) (n=312)             5 (FP)               307 (TN)
 
 The HDF5 model container `checkpoints/hybrid_best.h5` was generated from `checkpoints/hybrid_best.pth` and verified:
 - **Export Path:** [`checkpoints/hybrid_best.h5`](file:///C:/Users/admin_fix/Downloads/BONE CANCER ICIMCPS/checkpoints/hybrid_best.h5)
-- **Container Size:** **142.34 MB**
+- **Container Size:** **111.47 MB**
 - **Verification Status:** **PASSED** ($0$ numerical discrepancies against PyTorch `.pth` checkpoint).
 
 ---

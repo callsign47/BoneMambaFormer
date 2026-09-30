@@ -139,7 +139,8 @@ def plot_training_curves(history, figures_dir):
     plt.close()
     return curves_path
 
-def run_attention_fusion_training(num_epochs=25, batch_size=32, lr=5e-4, weight_decay=1e-4, seed=42):
+def run_attention_fusion_training(num_epochs=25, batch_size=32, lr=5e-4, weight_decay=1e-4, seed=42, patience=3):
+    import numpy as np
     set_seed(seed)
     
     cfg = ProjectConfig()
@@ -157,7 +158,7 @@ def run_attention_fusion_training(num_epochs=25, batch_size=32, lr=5e-4, weight_
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"==================================================", flush=True)
-    print(f"Starting Attention Fusion Training (Phase 6)", flush=True)
+    print(f"Starting Attention Fusion Training (M4, MobileNetV2 + Swin-Tiny + Mamba)", flush=True)
     print(f"Device: {device}", flush=True)
     if torch.cuda.is_available():
         print(f"GPU Name: {torch.cuda.get_device_name(0)}", flush=True)
@@ -165,7 +166,7 @@ def run_attention_fusion_training(num_epochs=25, batch_size=32, lr=5e-4, weight_
     print(f"Split Protocol: derived_clean (Leakage-Clean)", flush=True)
     print(f"Input Resolution: 224x224", flush=True)
     print(f"Class Mapping: cancer=0, normal=1", flush=True)
-    print(f"Batch Size: {batch_size}, LR: {lr}, Epochs: {num_epochs}", flush=True)
+    print(f"Batch Size: {batch_size}, LR: {lr}, Epochs: {num_epochs}, Patience: {patience}", flush=True)
     print(f"==================================================", flush=True)
 
     train_loader, val_loader, test_loader = get_dataloaders(cfg)
@@ -180,6 +181,7 @@ def run_attention_fusion_training(num_epochs=25, batch_size=32, lr=5e-4, weight_
         cnn_ckpt_path=cnn_ckpt,
         swin_ckpt_path=swin_ckpt,
         mamba_ckpt_path=mamba_ckpt,
+        cnn_backbone_name='mobilenet_v2',
         feature_dim=256,
         num_classes=2,
         dropout_rate=0.2,
@@ -192,7 +194,7 @@ def run_attention_fusion_training(num_epochs=25, batch_size=32, lr=5e-4, weight_
     frozen_params = total_params - trainable_params
     print(f"\nModel Parameter Stats:")
     print(f"  - Total Parameters:     {total_params:,}")
-    print(f"  - Frozen Parameters:    {frozen_params:,} (CNN + Swin + Mamba Backbones)")
+    print(f"  - Frozen Parameters:    {frozen_params:,} (MobileNetV2 + Swin + Mamba Backbones)")
     print(f"  - Trainable Parameters: {trainable_params:,} (Attention Fusion + Classifier Head)\n", flush=True)
 
     # Pre-extract features for train and val loaders
@@ -209,6 +211,8 @@ def run_attention_fusion_training(num_epochs=25, batch_size=32, lr=5e-4, weight_
     best_val_acc = 0.0
     best_val_loss = float('inf')
     best_epoch = 0
+    patience_counter = 0
+    early_stopping_triggered = False
     best_checkpoint_path = os.path.join(checkpoints_dir, 'attention_fusion_best.pth')
 
     history = []
@@ -233,6 +237,7 @@ def run_attention_fusion_training(num_epochs=25, batch_size=32, lr=5e-4, weight_
             best_val_loss = val_loss
             best_epoch = epoch
             is_best = True
+            patience_counter = 0
             
             torch.save({
                 'epoch': epoch,
@@ -243,6 +248,8 @@ def run_attention_fusion_training(num_epochs=25, batch_size=32, lr=5e-4, weight_
                 'val_f1': val_f1,
                 'config': cfg.to_dict()
             }, best_checkpoint_path)
+        else:
+            patience_counter += 1
 
         epoch_record = {
             'epoch': epoch,
@@ -263,7 +270,12 @@ def run_attention_fusion_training(num_epochs=25, batch_size=32, lr=5e-4, weight_
         print(f"Epoch [{epoch:02d}/{num_epochs:02d}] ({epoch_time*1000:.1f}ms) | "
               f"Train Loss: {train_loss:.4f}, Acc: {train_acc*100:.2f}% | "
               f"Val Loss: {val_loss:.4f}, Acc: {val_acc*100:.2f}%, F1: {val_f1:.4f} | "
-              f"LR: {current_lr:.6f} {'[BEST]' if is_best else ''}", flush=True)
+              f"LR: {current_lr:.6f} {'[BEST]' if is_best else f'[Patience: {patience_counter}/{patience}]'}", flush=True)
+
+        if patience_counter >= patience:
+            print(f"\n[EARLY STOPPING] Triggered at epoch {epoch}. Best epoch was Epoch {best_epoch} with Val Acc: {best_val_acc*100:.2f}%", flush=True)
+            early_stopping_triggered = True
+            break
 
         gpu_stats = {}
         if torch.cuda.is_available():
@@ -273,50 +285,90 @@ def run_attention_fusion_training(num_epochs=25, batch_size=32, lr=5e-4, weight_
                 'max_memory_reserved_mb': torch.cuda.max_memory_reserved(device) / (1024**2)
             }
 
-        training_summary = {
-            'model_name': 'BoneCancerAttentionFusion (Frozen CNN + Swin + Mamba + Softmax Branch Attention)',
-            'split_type': 'derived_clean',
-            'config': cfg.to_dict(),
-            'hyperparameters': {
-                'epochs': num_epochs,
-                'batch_size': batch_size,
-                'learning_rate': lr,
-                'weight_decay': weight_decay,
-                'seed': seed,
-                'optimizer': 'AdamW',
-                'scheduler': 'CosineAnnealingLR'
-            },
-            'parameter_counts': {
-                'total_params': total_params,
-                'trainable_params': trainable_params,
-                'frozen_params': frozen_params
-            },
-            'best_checkpoint': {
-                'epoch': best_epoch,
-                'checkpoint_path': best_checkpoint_path,
-                'val_accuracy': float(best_val_acc),
-                'val_loss': float(best_val_loss),
-                'val_f1': float(history[best_epoch-1]['val_f1']),
-                'val_precision': float(history[best_epoch-1]['val_precision']),
-                'val_recall': float(history[best_epoch-1]['val_recall'])
-            },
-            'total_training_time_sec': time.time() - start_time,
-            'total_training_time_min': (time.time() - start_time) / 60.0,
-            'gpu_usage': gpu_stats,
-            'epoch_history': history
-        }
-
-        log_path = os.path.join(results_dir, 'attention_fusion_training_history.json')
-        with open(log_path, 'w') as f:
-            json.dump(training_summary, f, indent=2)
-
         plot_training_curves(history, figures_dir)
+
+    training_summary = {
+        'model_name': 'BoneCancerAttentionFusion (Frozen MobileNetV2 + Swin + Mamba + Softmax Branch Attention)',
+        'split_type': 'derived_clean',
+        'config': cfg.to_dict(),
+        'hyperparameters': {
+            'epochs': num_epochs,
+            'batch_size': batch_size,
+            'learning_rate': lr,
+            'weight_decay': weight_decay,
+            'seed': seed,
+            'patience': patience,
+            'optimizer': 'AdamW',
+            'scheduler': 'CosineAnnealingLR'
+        },
+        'parameter_counts': {
+            'total_params': total_params,
+            'trainable_params': trainable_params,
+            'frozen_params': frozen_params
+        },
+        'best_checkpoint': {
+            'epoch': best_epoch,
+            'checkpoint_path': best_checkpoint_path,
+            'val_accuracy': float(best_val_acc),
+            'val_loss': float(best_val_loss),
+            'val_f1': float(history[best_epoch-1]['val_f1']),
+            'val_precision': float(history[best_epoch-1]['val_precision']),
+            'val_recall': float(history[best_epoch-1]['val_recall'])
+        },
+        'early_stopping_triggered': early_stopping_triggered,
+        'total_training_time_sec': time.time() - start_time,
+        'total_training_time_min': (time.time() - start_time) / 60.0,
+        'gpu_usage': gpu_stats,
+        'epoch_history': history
+    }
+
+    log_path = os.path.join(results_dir, 'attention_fusion_training_history.json')
+    with open(log_path, 'w') as f:
+        json.dump(training_summary, f, indent=2)
+
+    # Restore best checkpoint weights
+    if os.path.exists(best_checkpoint_path):
+        ckpt = torch.load(best_checkpoint_path, map_location=device)
+        model.load_state_dict(ckpt['model_state_dict'])
+        print(f"Restored best model weights from Epoch {best_epoch} ({best_checkpoint_path})", flush=True)
+
+    # Extract attention weights on validation set for branch contribution visualization
+    model.eval()
+    val_attn_list = []
+    with torch.no_grad():
+        for batch_feats, _ in cached_val_loader:
+            batch_feats = batch_feats.to(device)
+            _, attn_w = model.attention_fusion(batch_feats) # (B, 3, 1)
+            val_attn_list.extend(attn_w.squeeze(-1).cpu().numpy())
+    
+    val_attn = np.array(val_attn_list) # (N_val, 3)
+    mean_attn = np.mean(val_attn, axis=0) # [MobileNetV2, Swin, Mamba]
+    
+    branch_names = ['CNN (MobileNetV2)', 'Swin-Tiny', 'Mamba (SSM)']
+    fig, ax = plt.subplots(figsize=(8, 6))
+    colors = ['#1f77b4', '#2ca02c', '#ff7f0e']
+    bars = ax.bar(branch_names, mean_attn * 100, color=colors, alpha=0.85, edgecolor='black', linewidth=1.2)
+    ax.set_ylabel('Mean Attention Weight (%)', fontsize=12, fontweight='bold')
+    ax.set_title('M4 Attention Fusion Branch Contribution Weights (Val Set)', fontsize=14, fontweight='bold')
+    ax.set_ylim([0, max(mean_attn * 100) * 1.25])
+    ax.grid(True, linestyle='--', alpha=0.5, axis='y')
+
+    for bar, val in zip(bars, mean_attn * 100):
+        yval = bar.get_height()
+        ax.text(bar.get_x() + bar.get_width()/2.0, yval + 1.0, f"{val:.2f}%", ha='center', va='bottom', fontsize=11, fontweight='bold')
+
+    plt.tight_layout()
+    branch_plot_path = os.path.join(figures_dir, 'attention_fusion_branch_contributions.png')
+    plt.savefig(branch_plot_path, dpi=300, bbox_inches='tight')
+    plt.close()
+    print(f"Saved Attention Branch Contributions plot to: {branch_plot_path}", flush=True)
 
     total_training_time = time.time() - start_time
     print("\n==================================================", flush=True)
     print("Attention Fusion Training Phase COMPLETED Successfully!", flush=True)
     print(f"Total Time: {total_training_time/60.0:.2f} minutes ({total_training_time:.2f} s)", flush=True)
     print(f"Best Checkpoint: Epoch {best_epoch} | Val Acc: {best_val_acc*100:.2f}% | Val Loss: {best_val_loss:.4f}", flush=True)
+    print(f"Early Stopping Triggered: {early_stopping_triggered}", flush=True)
     print(f"Saved Checkpoint to: {best_checkpoint_path}", flush=True)
     print(f"Saved Training History to: {log_path}", flush=True)
     print("Saved Training Curves Plot to: figures/attention_fusion_training_curves.png", flush=True)

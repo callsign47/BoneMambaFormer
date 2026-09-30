@@ -11,10 +11,13 @@
 
 ## 1. Executive Summary & Verification Declaration
 
+> [!NOTE]
+> **Historical / Legacy Baseline Context:** Phase 9 ablations were conducted on the legacy ResNet-18 hybrid backbone (~39.74M parameters) as controlled component experiments. These results serve as historical architectural component evidence and do not represent or validate the Next-Gen MobileNetV2 architecture (M1, M4, M5).
+
 Phase 9 evaluates the structural contribution of each architectural branch and the **Softmax Branch Attention** mechanism. Controlled ablations were conducted using the locked model checkpoints on the untouched `derived_clean` test dataset.
 
 ### Key Architectural Findings:
-1. **Full Hybrid Model Dominance**: The joint end-to-end Hybrid model (CNN + Swin-Tiny + Mamba + Softmax Branch Attention, **39,737,093 trainable parameters ~40M**) achieves **98.42% Test Accuracy** and **0.9840 Macro F1**.
+1. **Full Hybrid Model Dominance**: The joint end-to-end Legacy Hybrid model (ResNet-18 + Swin-Tiny + Mamba + Softmax Branch Attention, **39,737,093 trainable parameters ~40M**) achieves **98.42% Test Accuracy** and **0.9840 Macro F1**.
 2. **Dynamic Softmax Attention vs Equal Weighting**: Softmax Branch Attention provides dynamic, sample-adaptive weighting over frozen/joint features.
 3. **Branch Masking Analysis**:
    - **Masking Swin-Tiny Branch (`w/o Swin`)**: Accuracy drops catastrophically to **69.35%** (a **29.07% drop**, Kappa drops to 0.3392), establishing Swin-Tiny as the primary vision backbone.
@@ -58,7 +61,7 @@ A rigorous diagnostic sanity check was executed via `src/evaluation/verify_ablat
 | **1. CNN (ResNet18)** | Locked Baseline | 94.82% | 0.9479 | 0.9931 | 0.9919 | 0.8959 | 0.8971 | 11,308,866 | 34.92 ms |
 | **2. Swin-Tiny** | Locked Baseline | 98.13% | 0.9811 | 0.9991 | 0.9990 | 0.9623 | 0.9625 | 27,717,244 | 35.68 ms |
 | **3. Mamba (SSM)** | Locked Baseline | 85.76% | 0.8573 | 0.9468 | 0.9443 | 0.7157 | 0.7213 | 661,060 | 44.04 ms |
-| **4. Attention Fusion (Frozen)** | Locked Baseline | **98.85%** | **0.9884** | **0.9978** | **0.9971** | **0.9767** | **0.9767** | 49,923 (~40M tot) | 37.31 ms |
+| **4. Attention Fusion (Frozen)** | Locked Baseline | **98.85%** | **0.9884** | **0.9978** | **0.9971** | **0.9767** | **0.9767** | 49,923 (39.74M Total Legacy ResNet-18) | 37.31 ms |
 | **5. Hybrid (End-to-End)** | Locked Baseline | **98.42%** | **0.9840** | **0.9990** | **0.9987** | **0.9680** | **0.9680** | **39,737,093 (~40M)** | **35.19 ms** |
 | **Equal Weighting (Fixed $\alpha$)** | Fusion Ablation | 98.71% | 0.9869 | 0.9990 | 0.9988 | 0.9738 | 0.9738 | ~40M | 35.47 ms |
 | **Swin + Mamba (w/o CNN)** | Branch Ablation | 98.71% | 0.9869 | 0.9989 | 0.9987 | 0.9738 | 0.9738 | ~40M | 35.99 ms |

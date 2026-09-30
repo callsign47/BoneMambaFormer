@@ -56,7 +56,7 @@ def evaluate_cnn_pipeline():
     print(f"Untouched Test Set Loaded: {test_samples_count} samples")
 
     # 2. Instantiate and load model
-    model = BoneCancerCNN(backbone_name='resnet18', num_classes=2, feature_dim=256).to(device)
+    model = BoneCancerCNN(backbone_name='mobilenet_v2', num_classes=2, feature_dim=256).to(device)
     checkpoint = torch.load(checkpoint_path, map_location=device)
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
@@ -260,7 +260,7 @@ def evaluate_cnn_pipeline():
     md_report_path = os.path.join(reports_dir, 'cnn_classification_report.md')
     with open(md_report_path, 'w') as f:
         f.write("# CNN Classification Report (Derived Clean Test Set)\n\n")
-        f.write(f"- **Model**: BoneCancerCNN (ResNet18 Backbone + 256D Feature Projection)\n")
+        f.write(f"- **Model**: BoneCancerCNN (MobileNetV2 Backbone + 256D Feature Projection)\n")
         f.write(f"- **Evaluated Checkpoint**: `{checkpoint_path}`\n")
         f.write(f"- **HDF5 Export**: `{h5_export_path}`\n")
         f.write(f"- **Test Set Size**: {test_samples_count} samples\n\n")
@@ -290,7 +290,7 @@ def evaluate_cnn_pipeline():
 
     # 7. Save Comprehensive JSON Evaluation Record
     eval_results = {
-        'model_name': 'BoneCancerCNN (ResNet18 backbone + 256D feature projection)',
+        'model_name': 'BoneCancerCNN (MobileNetV2 backbone + 256D feature projection)',
         'eval_split': 'derived_clean (Test Split)',
         'checkpoint_path_pth': checkpoint_path,
         'checkpoint_path_h5': h5_export_path if os.path.exists(h5_export_path) else None,

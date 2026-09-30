@@ -30,8 +30,8 @@ The model was trained on the `derived_clean` split ($7,417$ training images, $69
 | **Discriminative Ability** | **ROC-AUC Score** | **0.9991** |
 | | **PR-AUC Score (Avg Precision)** | **0.9990** |
 | **Timing & Latency** | **Total Training Duration** | **101.13 minutes** (6067.8 seconds) |
-| | **Inference Latency** | **28.66 ms / sample** |
-| | **Inference Throughput** | **34.9 FPS** (CUDA) |
+| | **Inference Latency** | **31.19 ms / sample** |
+| | **Inference Throughput** | **32.1 FPS** (CUDA) |
 
 ---
 

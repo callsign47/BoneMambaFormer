@@ -8,17 +8,24 @@ class BoneCancerCNN(nn.Module):
     Provides local feature extraction (edges, texture, boundaries) and
     projects features to a common 256-D space for future Adaptive Attention Fusion.
     
-    Default backbone: ResNet-18 (ImageNet pretrained)
+    Default backbone: MobileNetV2 (ImageNet pretrained) [Next-Gen standard]
+    Legacy backbone: ResNet-18
     Target resolution: 224x224
     Class mapping: cancer=0, normal=1
     """
-    def __init__(self, backbone_name='resnet18', num_classes=2, feature_dim=256, pretrained=True, dropout_rate=0.2):
+    def __init__(self, backbone_name='mobilenet_v2', num_classes=2, feature_dim=256, pretrained=True, dropout_rate=0.2):
         super(BoneCancerCNN, self).__init__()
         self.backbone_name = backbone_name
         self.feature_dim = feature_dim
         self.num_classes = num_classes
 
-        if backbone_name == 'resnet18':
+        if backbone_name == 'mobilenet_v2':
+            weights = models.MobileNet_V2_Weights.DEFAULT if pretrained else None
+            base_model = models.mobilenet_v2(weights=weights)
+            in_features = base_model.classifier[1].in_features
+            base_model.classifier = nn.Identity()
+            self.backbone = base_model
+        elif backbone_name == 'resnet18':
             weights = models.ResNet18_Weights.DEFAULT if pretrained else None
             base_model = models.resnet18(weights=weights)
             in_features = base_model.fc.in_features

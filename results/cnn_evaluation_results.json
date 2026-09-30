@@ -1,62 +1,61 @@
 {
-  "model_name": "BoneCancerCNN (ResNet18 backbone + 256D feature projection)",
+  "model_name": "BoneCancerCNN (MobileNetV2 backbone + 256D feature projection)",
   "eval_split": "derived_clean (Test Split)",
   "checkpoint_path_pth": "C:\\Users\\admin_fix\\Downloads\\BONE CANCER ICIMCPS\\checkpoints\\cnn_best.pth",
   "checkpoint_path_h5": "C:\\Users\\admin_fix\\Downloads\\BONE CANCER ICIMCPS\\checkpoints\\cnn_best.h5",
-  "best_checkpoint_epoch": 7,
-  "val_accuracy_at_best_epoch": 0.9770773638968482,
-  "val_loss_at_best_epoch": 0.0717013320995009,
+  "best_checkpoint_epoch": 5,
+  "val_accuracy_at_best_epoch": 0.9785100286532952,
+  "val_loss_at_best_epoch": 0.06552274534505469,
   "test_samples_count": 695,
   "timing_metrics": {
-    "total_training_time_sec": 1718.5,
-    "total_training_time_min": 28.64,
-    "total_inference_time_sec": 20.4189,
-    "per_sample_latency_ms": 29.38,
-    "inference_throughput_fps": 34.0
+    "total_training_time_sec": 1585.9181897640228,
+    "total_inference_time_sec": 20.431237700000565,
+    "per_sample_latency_ms": 29.397464316547573,
+    "inference_throughput_fps": 34.01653929169356
   },
   "overall_metrics": {
-    "accuracy": 0.9726618705035971,
-    "macro_precision": 0.9722454543933894,
-    "macro_recall": 0.9725220927897168,
-    "macro_f1_score": 0.9723816993464052,
-    "cohens_kappa": 0.944763514220101,
-    "matthews_corrcoef_mcc": 0.9447675066817129,
-    "roc_auc": 0.9976819307759256,
-    "pr_auc": 0.9972382524558353
+    "accuracy": 0.9755395683453237,
+    "macro_precision": 0.9747133343347854,
+    "macro_recall": 0.9760243020686885,
+    "macro_f1_score": 0.9753169726888518,
+    "cohens_kappa": 0.9506365235411348,
+    "matthews_corrcoef_mcc": 0.9507367325593689,
+    "roc_auc": 0.9988284126665328,
+    "pr_auc": 0.9985920318289296
   },
   "confusion_matrix": {
     "positive_class": "cancer (0)",
     "negative_class": "normal (1)",
-    "true_positives_TP": 373,
-    "false_negatives_FN": 10,
-    "false_positives_FP": 9,
-    "true_negatives_TN": 303,
+    "true_positives_TP": 372,
+    "false_negatives_FN": 11,
+    "false_positives_FP": 6,
+    "true_negatives_TN": 306,
     "raw_matrix": [
       [
-        373,
-        10
+        372,
+        11
       ],
       [
-        9,
-        303
+        6,
+        306
       ]
     ]
   },
   "per_class_metrics": {
     "cancer (0)": {
-      "precision": 0.9764397905759162,
-      "recall": 0.9738903394255874,
-      "f1_score": 0.9751633986928104,
-      "sensitivity": 0.9738903394255874,
-      "specificity": 0.9711538461538461,
+      "precision": 0.9841269841269841,
+      "recall": 0.9712793733681462,
+      "f1_score": 0.9776609724047306,
+      "sensitivity": 0.9712793733681462,
+      "specificity": 0.9807692307692307,
       "support": 383
     },
     "normal (1)": {
-      "precision": 0.9680511182108626,
-      "recall": 0.9711538461538461,
-      "f1_score": 0.9696,
-      "sensitivity": 0.9711538461538461,
-      "specificity": 0.9738903394255874,
+      "precision": 0.9652996845425867,
+      "recall": 0.9807692307692307,
+      "f1_score": 0.972972972972973,
+      "sensitivity": 0.9807692307692307,
+      "specificity": 0.9712793733681462,
       "support": 312
     }
   },

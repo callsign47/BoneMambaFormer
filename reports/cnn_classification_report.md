@@ -1,38 +1,37 @@
 # CNN Classification Report (Derived Clean Test Set)
 
-- **Model**: BoneCancerCNN (ResNet18 Backbone + 256D Feature Projection)
-- **Evaluated Checkpoint**: `checkpoints/cnn_best.pth`
-- **HDF5 Export**: `checkpoints/cnn_best.h5`
+- **Model**: BoneCancerCNN (MobileNetV2 Backbone + 256D Feature Projection)
+- **Evaluated Checkpoint**: `C:\Users\admin_fix\Downloads\BONE CANCER ICIMCPS\checkpoints\cnn_best.pth`
+- **HDF5 Export**: `C:\Users\admin_fix\Downloads\BONE CANCER ICIMCPS\checkpoints\cnn_best.h5`
 - **Test Set Size**: 695 samples
 
 ## Confusion Matrix & Terminology (Positive Class = Cancer [0])
 
-| Term | Full Name | Clinical Definition | Sample Count |
+| Term | Full Name | Definition | Sample Count |
 |---|---|---|---|
-| **TP** | True Positive | True Cancer correctly predicted as Cancer | **373** |
-| **FN** | False Negative | True Cancer incorrectly predicted as Normal | **10** |
-| **FP** | False Positive | True Normal incorrectly predicted as Cancer | **9** |
-| **TN** | True Negative | True Normal correctly predicted as Normal | **303** |
+| **TP** | True Positive | True Cancer predicted as Cancer | **372** |
+| **FN** | False Negative | True Cancer predicted as Normal | **11** |
+| **FP** | False Positive | True Normal predicted as Cancer | **6** |
+| **TN** | True Negative | True Normal predicted as Normal | **306** |
 
-## Overall Performance Metrics
+## Performance Summary
 
 | Metric | Score |
 |---|---|
-| **Test Accuracy** | **97.27%** ($676 / 695$ correct) |
-| **Macro Precision** | **0.9722** |
-| **Macro Recall** | **0.9725** |
-| **Macro F1-Score** | **0.9724** |
-| **Cohen's Kappa ($\kappa$)** | **0.9448** |
-| **Matthews Correlation Coefficient (MCC)** | **0.9448** |
-| **ROC-AUC** | **0.9977** |
-| **PR-AUC** | **0.9972** |
-| **Inference Latency** | **29.38 ms / sample** |
+| **Test Accuracy** | **97.55%** |
+| **Macro Precision** | **0.9747** |
+| **Macro Recall** | **0.9760** |
+| **Macro F1-Score** | **0.9753** |
+| **Cohen's Kappa** | **0.9506** |
+| **Matthews Correlation Coefficient (MCC)** | **0.9507** |
+| **ROC-AUC** | **0.9988** |
+| **PR-AUC** | **0.9986** |
+| **Inference Latency** | **29.40 ms / sample** |
 | **Inference Throughput** | **34.0 FPS** |
 
 ## Per-Class Breakdown
 
 | Class | Precision | Recall (Sensitivity) | Specificity | F1-Score | Support |
 |---|---|---|---|---|---|
-| **Cancer (Class 0)** | **0.9764** | **0.9739** | **0.9712** | **0.9752** | 383 |
-| **Normal (Class 1)** | **0.9681** | **0.9712** | **0.9739** | **0.9696** | 312 |
-| **Macro Average** | **0.9722** | **0.9725** | **0.9725** | **0.9724** | 695 |
+| **Cancer (0)** | 0.9841 | 0.9713 | 0.9808 | 0.9777 | 383 |
+| **Normal (1)** | 0.9653 | 0.9808 | 0.9713 | 0.9730 | 312 |

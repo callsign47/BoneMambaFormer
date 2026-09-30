@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import json
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -127,7 +128,42 @@ def plot_training_curves(history, figures_dir):
     plt.close()
     return curves_path
 
-def run_hybrid_end_to_end_training(num_epochs=20, batch_size=16, lr_backbone=2e-5, lr_head=1e-4, weight_decay=1e-4, seed=42):
+def plot_attention_branch_contributions(model, val_loader, device, figures_dir):
+    model.eval()
+    all_attn_weights = []
+    with torch.no_grad():
+        for inputs, _ in val_loader:
+            inputs = inputs.to(device)
+            _, attn_weights = model(inputs, return_attention=True)
+            all_attn_weights.append(attn_weights.squeeze(-1).cpu())
+
+    all_attn_weights = torch.cat(all_attn_weights, dim=0).numpy()
+    mean_weights = np.mean(all_attn_weights, axis=0)
+
+    branches = ['MobileNetV2 (CNN)', 'Swin-Tiny', 'Mamba (SSM)']
+    colors = ['#1f77b4', '#2ca02c', '#9467bd']
+
+    plt.figure(figsize=(8, 5))
+    bars = plt.bar(branches, mean_weights * 100, color=colors, width=0.5, edgecolor='black', linewidth=1.2)
+    plt.title('M5 Hybrid Joint Model: Learned Branch Attention Weights (Validation Set)', fontsize=12, fontweight='bold')
+    plt.ylabel('Mean Attention Contribution (%)', fontsize=11)
+    plt.ylim(0, 100)
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+
+    for bar, pct in zip(bars, mean_weights * 100):
+        yval = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width()/2.0, yval + 1.5, f"{pct:.2f}%", ha='center', va='bottom', fontsize=11, fontweight='bold')
+
+    plt.tight_layout()
+    plot_path = os.path.join(figures_dir, 'hybrid_branch_contributions.png')
+    plt.savefig(plot_path, dpi=300)
+    plt.close()
+
+    print(f"Saved M5 Attention Branch Contributions plot to: {plot_path}", flush=True)
+    print(f"Learned Attention Weights - MobileNetV2: {mean_weights[0]*100:.2f}%, Swin-Tiny: {mean_weights[1]*100:.2f}%, Mamba: {mean_weights[2]*100:.2f}%", flush=True)
+    return mean_weights
+
+def run_hybrid_end_to_end_training(num_epochs=20, batch_size=16, lr_backbone=2e-5, lr_head=1e-4, weight_decay=1e-4, patience=3, seed=42):
     set_seed(seed)
 
     cfg = ProjectConfig()
@@ -145,7 +181,7 @@ def run_hybrid_end_to_end_training(num_epochs=20, batch_size=16, lr_backbone=2e-
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"==================================================", flush=True)
-    print(f"Starting Final End-to-End Hybrid Model Training (Phase 7)", flush=True)
+    print(f"Starting Final End-to-End Hybrid Model Training (M5)", flush=True)
     print(f"Device: {device}", flush=True)
     if torch.cuda.is_available():
         print(f"GPU Name: {torch.cuda.get_device_name(0)}", flush=True)
@@ -153,7 +189,7 @@ def run_hybrid_end_to_end_training(num_epochs=20, batch_size=16, lr_backbone=2e-
     print(f"Split Protocol: derived_clean (Leakage-Clean)", flush=True)
     print(f"Input Resolution: 224x224", flush=True)
     print(f"Class Mapping: cancer=0, normal=1", flush=True)
-    print(f"Batch Size: {batch_size}, Backbone LR: {lr_backbone}, Head LR: {lr_head}, Epochs: {num_epochs}", flush=True)
+    print(f"Batch Size: {batch_size}, Backbone LR: {lr_backbone}, Head LR: {lr_head}, Epochs: {num_epochs}, Patience: {patience}", flush=True)
     print(f"==================================================", flush=True)
 
     train_loader, val_loader, test_loader = get_dataloaders(cfg)
@@ -165,11 +201,12 @@ def run_hybrid_end_to_end_training(num_epochs=20, batch_size=16, lr_backbone=2e-
     mamba_ckpt = os.path.join(checkpoints_dir, 'mamba_best.pth')
     fusion_ckpt = os.path.join(checkpoints_dir, 'attention_fusion_best.pth')
 
-    # Instantiate joint hybrid model with un-frozen backbones
+    # Instantiate joint hybrid model with un-frozen backbones and MobileNetV2 CNN branch
     model = BoneCancerAttentionFusion(
         cnn_ckpt_path=cnn_ckpt,
         swin_ckpt_path=swin_ckpt,
         mamba_ckpt_path=mamba_ckpt,
+        cnn_backbone_name='mobilenet_v2',
         feature_dim=256,
         num_classes=2,
         dropout_rate=0.2,
@@ -181,7 +218,6 @@ def run_hybrid_end_to_end_training(num_epochs=20, batch_size=16, lr_backbone=2e-
         print(f"Loading Phase 6 attention & classifier weights from: {fusion_ckpt}", flush=True)
         ckpt = torch.load(fusion_ckpt, map_location='cpu')
         model_sd = ckpt.get('model_state_dict', ckpt)
-        # Load weights into model
         model.load_state_dict(model_sd, strict=False)
 
     # Calculate parameter stats
@@ -208,6 +244,8 @@ def run_hybrid_end_to_end_training(num_epochs=20, batch_size=16, lr_backbone=2e-
     best_val_acc = 0.0
     best_val_loss = float('inf')
     best_epoch = 0
+    patience_counter = 0
+    early_stopping_triggered = False
     best_checkpoint_path = os.path.join(checkpoints_dir, 'hybrid_best.pth')
 
     history = []
@@ -233,6 +271,7 @@ def run_hybrid_end_to_end_training(num_epochs=20, batch_size=16, lr_backbone=2e-
             best_val_loss = val_loss
             best_epoch = epoch
             is_best = True
+            patience_counter = 0
 
             torch.save({
                 'epoch': epoch,
@@ -243,6 +282,8 @@ def run_hybrid_end_to_end_training(num_epochs=20, batch_size=16, lr_backbone=2e-
                 'val_f1': val_f1,
                 'config': cfg.to_dict()
             }, best_checkpoint_path)
+        else:
+            patience_counter += 1
 
         epoch_record = {
             'epoch': epoch,
@@ -264,66 +305,89 @@ def run_hybrid_end_to_end_training(num_epochs=20, batch_size=16, lr_backbone=2e-
         print(f"Epoch [{epoch:02d}/{num_epochs:02d}] ({epoch_time:.1f}s) | "
               f"Train Loss: {train_loss:.4f}, Acc: {train_acc*100:.2f}% | "
               f"Val Loss: {val_loss:.4f}, Acc: {val_acc*100:.2f}%, F1: {val_f1:.4f} | "
-              f"LR: {current_lr_head:.6f} {'[BEST]' if is_best else ''}", flush=True)
+              f"LR: {current_lr_head:.6f} {'[BEST]' if is_best else f'[Patience: {patience_counter}/{patience}]'}", flush=True)
 
-        gpu_stats = {}
-        if torch.cuda.is_available():
-            gpu_stats = {
-                'device_name': torch.cuda.get_device_name(0),
-                'max_memory_allocated_mb': torch.cuda.max_memory_allocated(device) / (1024**2),
-                'max_memory_reserved_mb': torch.cuda.max_memory_reserved(device) / (1024**2)
-            }
+        if patience_counter >= patience:
+            print(f"\n[EARLY STOPPING] Triggered at epoch {epoch}. Best epoch was Epoch {best_epoch} with Val Acc: {best_val_acc*100:.2f}%", flush=True)
+            early_stopping_triggered = True
+            break
 
-        training_summary = {
-            'model_name': 'BoneCancerHybridModel (Joint End-to-End CNN + Swin-Tiny + Mamba + Softmax Branch Attention)',
-            'split_type': 'derived_clean',
-            'config': cfg.to_dict(),
-            'hyperparameters': {
-                'epochs': num_epochs,
-                'batch_size': batch_size,
-                'lr_backbone': lr_backbone,
-                'lr_head': lr_head,
-                'weight_decay': weight_decay,
-                'seed': seed,
-                'optimizer': 'AdamW',
-                'scheduler': 'CosineAnnealingLR'
-            },
-            'parameter_counts': {
-                'total_params': total_params,
-                'trainable_params': trainable_params
-            },
-            'best_checkpoint': {
-                'epoch': best_epoch,
-                'checkpoint_path': best_checkpoint_path,
-                'val_accuracy': float(best_val_acc),
-                'val_loss': float(best_val_loss),
-                'val_f1': float(history[best_epoch-1]['val_f1']),
-                'val_precision': float(history[best_epoch-1]['val_precision']),
-                'val_recall': float(history[best_epoch-1]['val_recall'])
-            },
-            'total_training_time_sec': time.time() - start_time,
-            'total_training_time_min': (time.time() - start_time) / 60.0,
-            'gpu_usage': gpu_stats,
-            'epoch_history': history
+    gpu_stats = {}
+    if torch.cuda.is_available():
+        gpu_stats = {
+            'device_name': torch.cuda.get_device_name(0),
+            'max_memory_allocated_mb': torch.cuda.max_memory_allocated(device) / (1024**2),
+            'max_memory_reserved_mb': torch.cuda.max_memory_reserved(device) / (1024**2)
         }
 
-        log_path = os.path.join(results_dir, 'hybrid_training_history.json')
-        with open(log_path, 'w') as f:
-            json.dump(training_summary, f, indent=2)
+    plot_training_curves(history, figures_dir)
 
-        plot_training_curves(history, figures_dir)
+    # Restore best checkpoint weights
+    if os.path.exists(best_checkpoint_path):
+        ckpt = torch.load(best_checkpoint_path, map_location=device)
+        model.load_state_dict(ckpt['model_state_dict'])
+        print(f"Restored best model weights from Epoch {best_epoch} ({best_checkpoint_path})", flush=True)
+
+    # Plot attention branch contributions on validation set using restored best checkpoint
+    mean_branch_weights = plot_attention_branch_contributions(model, val_loader, device, figures_dir)
+
+    training_summary = {
+        'model_name': 'BoneCancerHybridModel (Joint End-to-End MobileNetV2 + Swin + Mamba + Softmax Branch Attention)',
+        'split_type': 'derived_clean',
+        'config': cfg.to_dict(),
+        'hyperparameters': {
+            'epochs': num_epochs,
+            'batch_size': batch_size,
+            'lr_backbone': lr_backbone,
+            'lr_head': lr_head,
+            'weight_decay': weight_decay,
+            'patience': patience,
+            'seed': seed,
+            'optimizer': 'AdamW',
+            'scheduler': 'CosineAnnealingLR'
+        },
+        'parameter_counts': {
+            'total_params': total_params,
+            'trainable_params': trainable_params
+        },
+        'best_checkpoint': {
+            'epoch': best_epoch,
+            'checkpoint_path': best_checkpoint_path,
+            'val_accuracy': float(best_val_acc),
+            'val_loss': float(best_val_loss),
+            'val_f1': float(history[best_epoch-1]['val_f1']),
+            'val_precision': float(history[best_epoch-1]['val_precision']),
+            'val_recall': float(history[best_epoch-1]['val_recall'])
+        },
+        'early_stopping_triggered': early_stopping_triggered,
+        'branch_contributions_val': {
+            'mobilenet_v2_pct': float(mean_branch_weights[0] * 100),
+            'swin_tiny_pct': float(mean_branch_weights[1] * 100),
+            'mamba_ssm_pct': float(mean_branch_weights[2] * 100)
+        },
+        'total_training_time_sec': time.time() - start_time,
+        'total_training_time_min': (time.time() - start_time) / 60.0,
+        'gpu_usage': gpu_stats,
+        'epoch_history': history
+    }
+
+    log_path = os.path.join(results_dir, 'hybrid_training_history.json')
+    with open(log_path, 'w') as f:
+        json.dump(training_summary, f, indent=2)
 
     total_training_time = time.time() - start_time
     print("\n==================================================", flush=True)
-    print("Final End-to-End Hybrid Model Training Phase COMPLETED Successfully!", flush=True)
+    print("Final End-to-End Hybrid Model Training Phase (M5) COMPLETED Successfully!", flush=True)
     print(f"Total Time: {total_training_time/60.0:.2f} minutes ({total_training_time:.2f} s)", flush=True)
     print(f"Best Checkpoint: Epoch {best_epoch} | Val Acc: {best_val_acc*100:.2f}% | Val Loss: {best_val_loss:.4f}", flush=True)
+    print(f"Early Stopping Triggered: {early_stopping_triggered}", flush=True)
     print(f"Saved Checkpoint to: {best_checkpoint_path}", flush=True)
     print(f"Saved Training History to: {log_path}", flush=True)
     print("Saved Training Curves Plot to: figures/hybrid_training_curves.png", flush=True)
+    print("Saved Attention Branch Contributions Plot to: figures/hybrid_branch_contributions.png", flush=True)
     print("==================================================", flush=True)
 
     return training_summary
 
 if __name__ == '__main__':
-    run_hybrid_end_to_end_training(num_epochs=20, batch_size=16, lr_backbone=2e-5, lr_head=1e-4)
+    run_hybrid_end_to_end_training(num_epochs=20, batch_size=16, lr_backbone=2e-5, lr_head=1e-4, patience=3)

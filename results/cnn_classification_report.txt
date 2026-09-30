@@ -3,25 +3,24 @@ CNN BONE CANCER CLASSIFICATION REPORT (Derived Clean Test Set)
 
               precision    recall  f1-score   support
 
-      cancer     0.9764    0.9739    0.9752       383
-      normal     0.9681    0.9712    0.9696       312
+      cancer     0.9841    0.9713    0.9777       383
+      normal     0.9653    0.9808    0.9730       312
 
-    accuracy                         0.9727       695
-   macro avg     0.9722    0.9725    0.9724       695
-weighted avg     0.9727    0.9727    0.9727       695
+    accuracy                         0.9755       695
+   macro avg     0.9747    0.9760    0.9753       695
+weighted avg     0.9757    0.9755    0.9756       695
 
 
-CONFUSION MATRIX & CLINICAL TERMINOLOGY (Positive Class = Cancer [0]):
-  True Positives  (TP - True Cancer -> Predicted Cancer): 373
-  False Negatives (FN - True Cancer -> Predicted Normal): 10
-  False Positives (FP - True Normal -> Predicted Cancer): 9
-  True Negatives  (TN - True Normal -> Predicted Normal): 303
+CONFUSION MATRIX & CLINICAL METRICS (Positive Class = Cancer [0]):
+  True Positives (TP - Cancer -> Cancer): 372
+  False Negatives (FN - Cancer -> Normal): 11
+  False Positives (FP - Normal -> Cancer): 6
+  True Negatives (TN - Normal -> Normal): 306
 
-SUMMARY METRICS:
-  Test Accuracy:             97.27%
-  Cohen's Kappa (kappa):     0.9448
-  Matthews Corr Coef (MCC):  0.9448
-  ROC-AUC:                   0.9977
-  PR-AUC:                    0.9972
-  Inference Latency:         29.38 ms/sample
-  Inference Throughput:      34.0 FPS
+Accuracy:                  97.55%
+Cohen's Kappa:             0.9506
+Matthews Corr Coef (MCC):  0.9507
+ROC-AUC:                   0.9988
+PR-AUC:                    0.9986
+Inference Latency:         29.40 ms/sample
+Inference Throughput:      34.0 FPS

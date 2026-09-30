@@ -108,7 +108,7 @@ def plot_training_curves(history, figures_dir):
     plt.close()
     return curves_path
 
-def run_cnn_training(num_epochs=20, batch_size=32, lr=1e-4, weight_decay=1e-4, seed=42):
+def run_cnn_training(num_epochs=20, batch_size=32, lr=1e-4, weight_decay=1e-4, seed=42, patience=3):
     set_seed(seed)
     
     cfg = ProjectConfig()
@@ -126,7 +126,7 @@ def run_cnn_training(num_epochs=20, batch_size=32, lr=1e-4, weight_decay=1e-4, s
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"==================================================", flush=True)
-    print(f"Starting CNN Training (Phase 3)", flush=True)
+    print(f"Starting Standalone MobileNetV2 CNN Training (M1)", flush=True)
     print(f"Device: {device}", flush=True)
     if torch.cuda.is_available():
         print(f"GPU Name: {torch.cuda.get_device_name(0)}", flush=True)
@@ -134,14 +134,14 @@ def run_cnn_training(num_epochs=20, batch_size=32, lr=1e-4, weight_decay=1e-4, s
     print(f"Split Protocol: derived_clean (Leakage-Clean)", flush=True)
     print(f"Input Resolution: 224x224", flush=True)
     print(f"Class Mapping: cancer=0, normal=1", flush=True)
-    print(f"Batch Size: {batch_size}, LR: {lr}, Epochs: {num_epochs}", flush=True)
+    print(f"Batch Size: {batch_size}, LR: {lr}, Epochs: {num_epochs}, Patience: {patience}", flush=True)
     print(f"==================================================", flush=True)
 
     train_loader, val_loader, test_loader = get_dataloaders(cfg)
     print(f"Dataset Loaded | Train Samples: {len(train_loader.dataset)}, Val Samples: {len(val_loader.dataset)}", flush=True)
     print(f"Test Set retained untouched: {len(test_loader.dataset)} samples", flush=True)
 
-    model = BoneCancerCNN(backbone_name='resnet18', num_classes=2, feature_dim=256, pretrained=True).to(device)
+    model = BoneCancerCNN(backbone_name='mobilenet_v2', num_classes=2, feature_dim=256, pretrained=True).to(device)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
@@ -150,6 +150,7 @@ def run_cnn_training(num_epochs=20, batch_size=32, lr=1e-4, weight_decay=1e-4, s
     best_val_acc = 0.0
     best_val_loss = float('inf')
     best_epoch = 0
+    patience_counter = 0
     best_checkpoint_path = os.path.join(checkpoints_dir, 'cnn_best.pth')
 
     history = []
@@ -174,6 +175,7 @@ def run_cnn_training(num_epochs=20, batch_size=32, lr=1e-4, weight_decay=1e-4, s
             best_val_loss = val_loss
             best_epoch = epoch
             is_best = True
+            patience_counter = 0
             
             torch.save({
                 'epoch': epoch,
@@ -184,6 +186,8 @@ def run_cnn_training(num_epochs=20, batch_size=32, lr=1e-4, weight_decay=1e-4, s
                 'val_f1': val_f1,
                 'config': cfg.to_dict()
             }, best_checkpoint_path)
+        else:
+            patience_counter += 1
 
         epoch_record = {
             'epoch': epoch,
@@ -204,7 +208,11 @@ def run_cnn_training(num_epochs=20, batch_size=32, lr=1e-4, weight_decay=1e-4, s
         print(f"Epoch [{epoch:02d}/{num_epochs:02d}] ({epoch_time:.1f}s) | "
               f"Train Loss: {train_loss:.4f}, Acc: {train_acc*100:.2f}% | "
               f"Val Loss: {val_loss:.4f}, Acc: {val_acc*100:.2f}%, F1: {val_f1:.4f} | "
-              f"LR: {current_lr:.6f} {'[BEST]' if is_best else ''}", flush=True)
+              f"LR: {current_lr:.6f} {'[BEST]' if is_best else f'[Patience: {patience_counter}/{patience}]'}", flush=True)
+
+        if patience_counter >= patience:
+            print(f"\n[EARLY STOPPING] Triggered at epoch {epoch}. Best epoch was Epoch {best_epoch} with Val Acc: {best_val_acc*100:.2f}%", flush=True)
+            break
 
         # Incremental write of training summary & curves after every epoch
         gpu_stats = {}
@@ -216,7 +224,7 @@ def run_cnn_training(num_epochs=20, batch_size=32, lr=1e-4, weight_decay=1e-4, s
             }
 
         training_summary = {
-            'model_name': 'BoneCancerCNN (ResNet18 backbone + 256D projection)',
+            'model_name': 'BoneCancerCNN (MobileNetV2 backbone + 256D projection)',
             'split_type': 'derived_clean',
             'config': cfg.to_dict(),
             'hyperparameters': {

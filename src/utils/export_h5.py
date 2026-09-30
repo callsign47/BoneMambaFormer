@@ -33,7 +33,7 @@ def export_pth_to_h5(pth_path, h5_path, model_type='cnn'):
     val_loss = checkpoint.get("val_loss", None)
 
     if model_type == 'cnn':
-        arch_desc = "BoneCancerCNN (ResNet18 backbone + 256D projection + 2-class head)"
+        arch_desc = "BoneCancerCNN (MobileNetV2 backbone + 256D projection + 2-class head)"
     elif model_type == 'swin':
         arch_desc = "BoneCancerSwin (Swin-Tiny backbone + 256D projection + 2-class head)"
     elif model_type == 'mamba':

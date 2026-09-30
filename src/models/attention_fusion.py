@@ -58,6 +58,7 @@ class BoneCancerAttentionFusion(nn.Module):
         cnn_ckpt_path=None,
         swin_ckpt_path=None,
         mamba_ckpt_path=None,
+        cnn_backbone_name='mobilenet_v2',
         feature_dim=256,
         num_classes=2,
         dropout_rate=0.2,
@@ -67,9 +68,10 @@ class BoneCancerAttentionFusion(nn.Module):
         self.feature_dim = feature_dim
         self.num_classes = num_classes
         self.freeze_backbones = freeze_backbones
+        self.cnn_backbone_name = cnn_backbone_name
 
         # Initialize backbone branches
-        self.cnn_branch = BoneCancerCNN(pretrained=False, feature_dim=feature_dim, num_classes=num_classes)
+        self.cnn_branch = BoneCancerCNN(backbone_name=cnn_backbone_name, pretrained=False, feature_dim=feature_dim, num_classes=num_classes)
         self.swin_branch = BoneCancerSwin(pretrained=False, feature_dim=feature_dim, num_classes=num_classes)
         self.mamba_branch = BoneCancerMamba(img_size=224, patch_size=32, d_model=128, depth=2, feature_dim=feature_dim, num_classes=num_classes)
 
